@@ -44,7 +44,7 @@ namespace NAG
 			void reserve(const size_t&);
 			void Clear();
 
-			Vector<type>& operator=(const NAG::Math::Vector<type>&);
+			Vector<type>& operator=(const NAG::Math::Vector<value_type>&);
 			bool operator==(const Vector&) const;
 			bool operator!=(const Vector&) const;
 
@@ -76,20 +76,24 @@ namespace NAG
 
 			void Push_Back(const value_type&);
 			void Pop_Back();
-			void Assign(const size_t&, const type&);
-			void Assign(const std::initializer_list<type>&);
+			void Assign(const size_t&, const value_type&);
+			void Assign(const std::initializer_list<value_type>&);
 			template<AllIterator IT>
 			void Assign(const IT&, const IT&);
 			void Insert(const iterator_type&, const value_type&);
 			void Insert(const iterator_type&,const size_t&, const value_type&);
-			void Insert(const iterator_type&,const std::initializer_list<type>&);
+			void Insert(const iterator_type&,const std::initializer_list<value_type>&);
 			template<AllIterator IT>
 			void Insert(const iterator_type&, const IT&, const IT&);
+
 			void Erase(const iterator_type&);
 			void Erase(const iterator_type&, const iterator_type&);
+			void Erase(const iterator_type&,const size_t& size);
+
+
 			template<AllContainer container>
 			void AppendRange(const container&);
-			void swap(Vector<type>&);
+			void swap(Vector&);
 
 		private:
 			template<typename T, typename... Rest>
@@ -395,7 +399,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		void Vector<type>::Assign(const size_t& count, const type& data)
+		void Vector<type>::Assign(const size_t& count, const value_type& data)
 		{
 			Clear();
 			resize(count);
@@ -403,7 +407,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		void Vector<type>::Assign(const std::initializer_list<type>& list)
+		void Vector<type>::Assign(const std::initializer_list<value_type>& list)
 		{
 			Clear();
 			resize(list.size());
@@ -427,7 +431,7 @@ namespace NAG
 		void Vector<type>::Insert(const iterator_type& it, const value_type& data)
 		{
 			if (it < Begin() || it > End())
-				throw std::out_of_range("it doesn't exist");
+				throw std::out_of_range("Iterator is invalid");
 			resize(m_size + 1);
 			for (auto curent_it = End() - 1; curent_it != it ; --curent_it)
 			{
@@ -440,7 +444,7 @@ namespace NAG
 		void Vector<type>::Insert(const iterator_type& it, const size_t& count, const value_type& data)
 		{
 			if (it < Begin() || it > End())
-				throw std::out_of_range("it doesn't exist");
+				throw std::out_of_range("Iterator is invalid");
 			resize(m_size + count);
 			for (auto curent_it = End() - 1; curent_it != it + count; --curent_it)
 			{
@@ -453,10 +457,10 @@ namespace NAG
 		}
 
 		template <typename type>
-		void Vector<type>::Insert(const iterator_type& it, const std::initializer_list<type>& list)
+		void Vector<type>::Insert(const iterator_type& it, const std::initializer_list<value_type>& list)
 		{
 			if (it < Begin() || it > End())
-				throw std::out_of_range("it doesn't exist");
+				throw std::out_of_range("Iterator is invalid");
 			resize(m_size + list.size());
 			for (auto curent_it = End() - 1; curent_it != it + list.size(); --curent_it)
 			{
@@ -471,7 +475,7 @@ namespace NAG
 		{
 			auto count = end - begin;
 			if (it < Begin() || it > End())
-				throw std::out_of_range("it doesn't exist");
+				throw std::out_of_range("Iterator is invalid");
 			resize(m_size + count);
 			for (auto curent_it = End() - 1; curent_it != it + count; --curent_it)
 			{
@@ -484,8 +488,8 @@ namespace NAG
 		void Vector<type>::Erase(const iterator_type& it)
 		{
 			
-			if (static_cast<int>(it - Begin()) < 0 || static_cast<int>(it - End()) > m_size)
-				throw std::out_of_range("it doesn't exist");
+			if (it < Begin() || it > End())
+				throw std::out_of_range("Iterator is invalid");
 			for (auto current_it = it; current_it != End() - 1; ++current_it)
 			{
 				*current_it = *(current_it + 1);
@@ -493,34 +497,31 @@ namespace NAG
 			resize(m_size - 1);
 		}
 
+
 		template <typename type>
-		template <AllIterator IT>
-		void Vector<type>::Erase(const IT& it)
+		void Vector<type>::Erase(const iterator_type& begin, const iterator_type& end)
 		{
-			auto begin = IT{ m_data };
-			auto end = IT{ m_data + m_size };
-			if (static_cast<int>(it - begin ) < 0 || static_cast<int>(it - begin)> m_size)
-				throw std::out_of_range("it doesn't exist");
-			for (auto current_it = it; current_it != end - 1; ++current_it)
+			if (begin < Begin() || end > End() || begin > end)
+				throw std::out_of_range("Iterator is invalid");
+			size_t totalsize = end - begin;
+			for (auto current_it = begin; current_it != End() - totalsize ; ++current_it)
 			{
-				*current_it = *(current_it + 1);
+				*current_it = *(current_it + totalsize);
 			}
-			resize(m_size - 1);
+			resize(m_size - totalsize);
 		}
 
 		template <typename type>
-		template <AllIterator IT>
-		void Vector<type>::Erase(const IT& begin, const IT& end)
+		void Vector<type>::Erase(const iterator_type& it, const size_t& size)
 		{
-		/*	auto begin = IT{ m_data };
-			auto end = IT{ m_data + m_size };
-			if (static_cast<int>(begin - begin) < 0 || static_cast<int>(begin - begin) > m_size)
-				throw std::out_of_range("it doesn't exist");
-			for (auto current_it = it; current_it != end - 1; ++current_it)
+			auto end = it + size;
+			if (it < Begin() || end > End())
+				throw std::out_of_range("Iterator is invalid");
+			for (auto current_it = it; current_it != End() - size; ++current_it)
 			{
-				*current_it = *(current_it + 1);
+				*current_it = *(current_it + size);
 			}
-			resize(m_size - 1);*/
+			resize(m_size - size);
 		}
 
 		template <typename type>
@@ -531,7 +532,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		void Vector<type>::swap(Vector<type>& other)
+		void Vector<type>::swap(Vector& other)
 		{
 			auto tmpdata = m_data;
 			m_data = other.m_data;
