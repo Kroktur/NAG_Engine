@@ -11,6 +11,7 @@ namespace NAG
 			using pointer_type = type*;
 			using reference_type = type&;
 			using difference_type = std::ptrdiff_t;
+			using Iterator_type = int;
 			ReverseIterator(pointer_type);
 			ReverseIterator(const ReverseIterator&);
 			ReverseIterator();
@@ -213,6 +214,7 @@ public:
 	using pointer_type = const type*;
 	using reference_type = const type&;
 	using difference_type = std::ptrdiff_t;
+	using Iterator_type = int;
 	ConstReverseIterator(pointer_type);
 	ConstReverseIterator(const ConstReverseIterator&);
 	ConstReverseIterator();

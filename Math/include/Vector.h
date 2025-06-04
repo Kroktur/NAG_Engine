@@ -7,6 +7,19 @@ namespace NAG
 	namespace Math
 	{
 		template<typename type>
+		concept AllIterator = requires()
+		{
+			typename type::Iterator_type;
+		};
+
+		template<typename type>
+		concept AllContainer = requires(type t)
+		{
+			{ t.Begin() };
+			{ t.End() };
+		};
+
+		template<typename type>
 		class Vector
 		{
 		public:
@@ -30,7 +43,10 @@ namespace NAG
 			void resize(const size_t&);
 			void reserve(const size_t&);
 			void Clear();
-			reference_type operator=(const NAG::Math::Vector<type>&);
+
+			Vector<type>& operator=(const NAG::Math::Vector<type>&);
+			bool operator==(const Vector&) const;
+			bool operator!=(const Vector&) const;
 
 			size_t Size() const;
 			size_t Capacity() const;
@@ -48,6 +64,7 @@ namespace NAG
 			pointer_type data();
 			const_pointer_type data() const;
 
+
 			iterator_type Begin();
 			iterator_type End();
 			const_iterator_type CBegin();
@@ -59,7 +76,20 @@ namespace NAG
 
 			void Push_Back(const value_type&);
 			void Pop_Back();
-
+			void Assign(const size_t&, const type&);
+			void Assign(const std::initializer_list<type>&);
+			template<AllIterator IT>
+			void Assign(const IT&, const IT&);
+			void Insert(const iterator_type&, const value_type&);
+			void Insert(const iterator_type&,const size_t&, const value_type&);
+			void Insert(const iterator_type&,const std::initializer_list<type>&);
+			template<AllIterator IT>
+			void Insert(const iterator_type&, const IT&, const IT&);
+			void Erase(const iterator_type&);
+			void Erase(const iterator_type&, const iterator_type&);
+			template<AllContainer container>
+			void AppendRange(const container&);
+			void swap(Vector<type>&);
 
 		private:
 			template<typename T, typename... Rest>
@@ -72,6 +102,8 @@ namespace NAG
 			size_t m_size;
 			size_t m_capacity;
 		};
+
+	
 
 		template <typename type>
 		Vector<type>::Vector():m_size(0),m_capacity(0),m_data(nullptr)
@@ -112,7 +144,10 @@ namespace NAG
 		void Vector<type>::resize(const size_t& size)
 		{
 			if (size > m_capacity)
-				reserve(size * 2);
+			{
+				size_t nextsize = std::min(size * 2,MaxLimit());
+				reserve(nextsize);
+			}
 			m_size = size;
 		}
 
@@ -124,13 +159,18 @@ namespace NAG
 			if (capacity < m_size)
 				throw std::out_of_range("size must be bigger");
 
+			if (capacity == 0)
+			{
+				delete[] m_data;
+				m_data = nullptr;
+				return;
+			}
 			type* new_data = new type[capacity];
 			std::copy(m_data, m_data + m_size, new_data);
 			std::fill(new_data + m_size, new_data + capacity, type{});
 			delete[] m_data;
 			m_data = new_data;
 			m_capacity = capacity;
-
 		}
 
 		template <typename type>
@@ -239,6 +279,41 @@ namespace NAG
 		}
 
 		template <typename type>
+		Vector<type>& Vector<type>::operator=(const NAG::Math::Vector<type>& other)
+		{
+			resize(other.Size());
+			std::copy(other.Begin(), other.End(), m_data);
+			return *this;
+		}
+
+		template <typename type>
+		bool Vector<type>::operator==(const Vector& other) const
+		{
+			if (m_size != other.Size())
+				return false;
+			for (std::make_signed_t<size_t> i = 0; i < m_size ; ++ i)
+			{
+				if (m_data[i] != other[i])
+					return false;
+			}
+			return true;
+		}
+
+		template <typename type>
+		bool Vector<type>::operator!=(const Vector& other) const
+		{
+			if (m_size != other.Size())
+				return true;
+			for (std::make_signed_t<size_t> i = 0; i < m_size; ++i)
+			{
+				if (m_data[i] != other[i])
+					return true;
+			}
+			return false;
+		}
+
+
+		template <typename type>
 		typename Vector<type>::iterator_type Vector<type>::Begin()
 		{
 			if (IsEmpty())
@@ -292,7 +367,7 @@ namespace NAG
 		{
 			if (IsEmpty())
 				return ConstReverseIterator<type>{};
-			ConstReverseIterator<type>(m_data + m_size - 1);
+			return ConstReverseIterator<type>(m_data + m_size - 1);
 		}
 
 		template <typename type>
@@ -317,6 +392,158 @@ namespace NAG
 				return;
 			m_data[m_size - 1] = type{};
 			resize(m_size - 1);
+		}
+
+		template <typename type>
+		void Vector<type>::Assign(const size_t& count, const type& data)
+		{
+			Clear();
+			resize(count);
+			std::fill(m_data, m_data + m_size,data);
+		}
+
+		template <typename type>
+		void Vector<type>::Assign(const std::initializer_list<type>& list)
+		{
+			Clear();
+			resize(list.size());
+			std::copy(list.begin(), list.end(), m_data);
+		}
+
+		template <typename type>
+		template <AllIterator IT>
+		void Vector<type>::Assign(const IT& begin, const IT& end)
+		{
+			Clear();
+			auto size = end - begin;
+			resize(size);
+			for (auto i = 0 ; i< size ; ++i)
+			{
+				m_data[i] = *(begin + i);
+			}
+		}
+
+		template <typename type>
+		void Vector<type>::Insert(const iterator_type& it, const value_type& data)
+		{
+			if (it < Begin() || it > End())
+				throw std::out_of_range("it doesn't exist");
+			resize(m_size + 1);
+			for (auto curent_it = End() - 1; curent_it != it ; --curent_it)
+			{
+				*curent_it = *(curent_it - 1);
+			}
+			*it = data;
+		}
+
+		template <typename type>
+		void Vector<type>::Insert(const iterator_type& it, const size_t& count, const value_type& data)
+		{
+			if (it < Begin() || it > End())
+				throw std::out_of_range("it doesn't exist");
+			resize(m_size + count);
+			for (auto curent_it = End() - 1; curent_it != it + count; --curent_it)
+			{
+				*curent_it = *(curent_it - count);
+			}
+			for (auto curent_it = it; curent_it < it + count; ++ curent_it)
+			{
+				*curent_it = data;
+			}
+		}
+
+		template <typename type>
+		void Vector<type>::Insert(const iterator_type& it, const std::initializer_list<type>& list)
+		{
+			if (it < Begin() || it > End())
+				throw std::out_of_range("it doesn't exist");
+			resize(m_size + list.size());
+			for (auto curent_it = End() - 1; curent_it != it + list.size(); --curent_it)
+			{
+				*curent_it = *(curent_it - list.size());
+			}
+			std::copy(list.begin(), list.end(), it);
+		}
+
+		template <typename type>
+		template <AllIterator IT>
+		void Vector<type>::Insert(const iterator_type& it , const IT& begin, const IT& end)
+		{
+			auto count = end - begin;
+			if (it < Begin() || it > End())
+				throw std::out_of_range("it doesn't exist");
+			resize(m_size + count);
+			for (auto curent_it = End() - 1; curent_it != it + count; --curent_it)
+			{
+				*curent_it = *(curent_it - count);
+			}
+			std::copy(begin, end, it);
+		}
+
+		template <typename type>
+		void Vector<type>::Erase(const iterator_type& it)
+		{
+			
+			if (static_cast<int>(it - Begin()) < 0 || static_cast<int>(it - End()) > m_size)
+				throw std::out_of_range("it doesn't exist");
+			for (auto current_it = it; current_it != End() - 1; ++current_it)
+			{
+				*current_it = *(current_it + 1);
+			}
+			resize(m_size - 1);
+		}
+
+		template <typename type>
+		template <AllIterator IT>
+		void Vector<type>::Erase(const IT& it)
+		{
+			auto begin = IT{ m_data };
+			auto end = IT{ m_data + m_size };
+			if (static_cast<int>(it - begin ) < 0 || static_cast<int>(it - begin)> m_size)
+				throw std::out_of_range("it doesn't exist");
+			for (auto current_it = it; current_it != end - 1; ++current_it)
+			{
+				*current_it = *(current_it + 1);
+			}
+			resize(m_size - 1);
+		}
+
+		template <typename type>
+		template <AllIterator IT>
+		void Vector<type>::Erase(const IT& begin, const IT& end)
+		{
+		/*	auto begin = IT{ m_data };
+			auto end = IT{ m_data + m_size };
+			if (static_cast<int>(begin - begin) < 0 || static_cast<int>(begin - begin) > m_size)
+				throw std::out_of_range("it doesn't exist");
+			for (auto current_it = it; current_it != end - 1; ++current_it)
+			{
+				*current_it = *(current_it + 1);
+			}
+			resize(m_size - 1);*/
+		}
+
+		template <typename type>
+		template <AllContainer container>
+		void Vector<type>::AppendRange(const container& container)
+		{
+			Insert(End(), container.Begin(), container.End());
+		}
+
+		template <typename type>
+		void Vector<type>::swap(Vector<type>& other)
+		{
+			auto tmpdata = m_data;
+			m_data = other.m_data;
+			other.m_data = tmpdata;
+
+			auto tmpcapacity = m_capacity;
+			m_capacity = other.m_capacity;
+			other.m_capacity = tmpcapacity;
+
+			auto tmpsize = m_size;
+			m_size = other.m_size;
+			other.m_size = tmpsize;
 		}
 
 		template <typename type>

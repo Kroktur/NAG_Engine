@@ -3,6 +3,7 @@ namespace NAG
 {
 	namespace Math
 	{
+	
 		template<typename type>
 		class Iterator
 		{
@@ -10,7 +11,8 @@ namespace NAG
 			using value_type = type;
 			using pointer_type = type*;
 			using reference_type = type&;
-			using difference_type =std::ptrdiff_t;
+			using difference_type = std::ptrdiff_t;
+			using Iterator_type = int;
 			Iterator(pointer_type);
 			Iterator(const Iterator&);
 			Iterator();
@@ -212,6 +214,7 @@ public:
 	using pointer_type = const type*;
 	using reference_type = const type&;
 	using difference_type = std::ptrdiff_t;
+	using Iterator_type = int;
 	ConstIterator(pointer_type);
 	ConstIterator(const ConstIterator&);
 	ConstIterator();
