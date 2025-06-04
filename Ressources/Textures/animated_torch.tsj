@@ -1,0 +1,14 @@
+{ "columns":24,
+ "image":"..\/Downloads\/EPIC RPG World Pack - Crypt V.1.6\/EPIC RPG World Pack - Crypt V.1.6\/Props\/animated\/torch_fire.png",
+ "imageheight":64,
+ "imagewidth":768,
+ "margin":0,
+ "name":"animated_torch",
+ "spacing":0,
+ "tilecount":48,
+ "tiledversion":"1.11.2",
+ "tileheight":32,
+ "tilewidth":32,
+ "type":"tileset",
+ "version":"1.10"
+}

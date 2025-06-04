@@ -1,0 +1,25 @@
+
+project(Math)
+
+set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+
+set(HEADERS
+ ${HEADER_DIR}/Vector.h
+ ${HEADER_DIR}/Iterator.h
+ ${HEADER_DIR}/RevIterator.h
+)
+set(SOURCES
+${SOURCE_DIR}/TestMath.cpp
+)
+
+
+
+add_library(${PROJECT_NAME}
+${SOURCES}
+${HEADERS}
+)
+target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "Math")

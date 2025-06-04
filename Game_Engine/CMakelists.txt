@@ -1,0 +1,38 @@
+
+project(Game_Engine)
+
+set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+
+set(HEADERS
+ ${HEADER_DIR}/TestGE.h
+)
+set(SOURCES
+${SOURCE_DIR}/TestGE.cpp
+)
+
+
+
+add_library(${PROJECT_NAME}
+${SOURCES}
+${HEADERS}
+)
+target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    Game
+)
+find_package(SFML COMPONENTS 
+    System
+    Window
+    Graphics
+    Network
+    Audio
+CONFIG REQUIRED)
+
+find_package(nlohmann_json CONFIG REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE SFML::Network SFML::Graphics SFML::Window SFML::Audio SFML::System nlohmann_json::nlohmann_json)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "Game_Engine")

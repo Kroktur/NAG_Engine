@@ -1,0 +1,34 @@
+
+
+project(Game)
+
+set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+set(HEADERS
+ ${HEADER_DIR}/Test.h
+)
+set(SOURCES
+${SOURCE_DIR}/Test.cpp
+)
+
+add_library(${PROJECT_NAME}
+${SOURCES}
+${HEADERS}
+)
+target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    Game_Engine
+)
+find_package(SFML COMPONENTS 
+    System
+    Window
+    Graphics
+    Network
+    Audio
+CONFIG REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE SFML::Network SFML::Graphics SFML::Window SFML::Audio SFML::System)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "Game")
