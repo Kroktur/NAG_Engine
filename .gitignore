@@ -1,4 +1,3 @@
 build/*
 Docs/html/*
 vcpkg/*
-/Game_Engine/include/MapReader.h
