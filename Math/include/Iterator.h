@@ -1,5 +1,5 @@
 #pragma once
-namespace KT
+namespace NAG
 {
 	namespace Math
 	{
