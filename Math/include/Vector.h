@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include "RevIterator.h"
 #include "Iterator.h"
-namespace KT
+namespace NAG
 {
 	namespace Math
 	{
@@ -12,14 +12,14 @@ namespace KT
 		public:
 			using value_type = type;
 			using pointer_type = type*;
-			using constpointer_type = const type*;
+			using const_pointer_type = const type*;
 			using reference_type = type&;
-			using constreference_type =const type&;
+			using const_reference_type =const type&;
 			using difference_type = std::ptrdiff_t;
-			using iterator_type = KT::Math::Iterator<type>;
-			using reverseIterator_type = KT::Math::ReverseIterator<type>;
-			using constiterator_type = KT::Math::ConstIterator<type>;
-			using constreverseIterator_type = KT::Math::ConstReverseIterator<type>;
+			using iterator_type = NAG::Math::Iterator<type>;
+			using reverse_iterator_type = NAG::Math::ReverseIterator<type>;
+			using const_iterator_type = NAG::Math::ConstIterator<type>;
+			using const_reverse_Iterator_type = NAG::Math::ConstReverseIterator<type>;
 			Vector();
 			Vector(const Vector&);
 			Vector(const std::initializer_list<value_type>&);
@@ -30,6 +30,7 @@ namespace KT
 			void resize(const size_t&);
 			void reserve(const size_t&);
 			void Clear();
+			reference_type operator=(const NAG::Math::Vector<type>&);
 
 			size_t Size() const;
 			size_t Capacity() const;
@@ -38,26 +39,27 @@ namespace KT
 
 			reference_type operator[](const size_t&);
 			reference_type at(const size_t&);
-			constreference_type operator[](const size_t&) const;
-			constreference_type at(const size_t&)const;
+			const_reference_type operator[](const size_t&) const;
+			const_reference_type at(const size_t&)const;
 			reference_type front();
 			reference_type back();
-			constreference_type front() const;
-			constreference_type back() const;
+			const_reference_type front() const;
+			const_reference_type back() const;
 			pointer_type data();
-			constpointer_type data() const;
+			const_pointer_type data() const;
 
 			iterator_type Begin();
 			iterator_type End();
-			constiterator_type CBegin();
-			constiterator_type CEnd();
-			reverseIterator_type RBegin();
-			reverseIterator_type REnd();
-			constreverseIterator_type CRBegin();
-			constreverseIterator_type CREnd();
+			const_iterator_type CBegin();
+			const_iterator_type CEnd();
+			reverse_iterator_type RBegin();
+			reverse_iterator_type REnd();
+			const_reverse_Iterator_type CRBegin();
+			const_reverse_Iterator_type CREnd();
 
 			void Push_Back(const value_type&);
 			void Pop_Back();
+
 
 		private:
 			template<typename T, typename... Rest>
@@ -102,6 +104,7 @@ namespace KT
 		template <typename type>
 		Vector<type>::~Vector()
 		{
+			Clear();
 			delete[] m_data;
 		}
 
@@ -171,13 +174,13 @@ namespace KT
 		}
 
 		template <typename type>
-		typename Vector<type>::constreference_type Vector<type>::operator[](const size_t& index) const
+		typename Vector<type>::const_reference_type Vector<type>::operator[](const size_t& index) const
 		{
 			return m_data[index];
 		}
 
 		template <typename type>
-		typename Vector<type>::constreference_type Vector<type>::at(const size_t& index) const
+		typename Vector<type>::const_reference_type Vector<type>::at(const size_t& index) const
 		{
 			if (index > m_size - 1)
 				throw std::out_of_range(" index is too big");
@@ -201,7 +204,7 @@ namespace KT
 		}
 
 		template <typename type>
-		typename Vector<type>::constreference_type Vector<type>::front() const
+		typename Vector<type>::const_reference_type Vector<type>::front() const
 		{
 			if (IsEmpty())
 				throw std::out_of_range("Array is empty");
@@ -209,7 +212,7 @@ namespace KT
 		}
 
 		template <typename type>
-		typename Vector<type>::constreference_type Vector<type>::back() const
+		typename Vector<type>::const_reference_type Vector<type>::back() const
 		{
 			if (IsEmpty())
 				throw std::out_of_range("Array is empty");
@@ -223,7 +226,7 @@ namespace KT
 		}
 
 		template <typename type>
-		typename Vector<type>::constpointer_type Vector<type>::data() const
+		typename Vector<type>::const_pointer_type Vector<type>::data() const
 		{
 			return m_data;
 		}
@@ -253,7 +256,7 @@ namespace KT
 		}
 
 		template <typename type>
-		typename Vector<type>::constiterator_type Vector<type>::CBegin()
+		typename Vector<type>::const_iterator_type Vector<type>::CBegin()
 		{
 			if (IsEmpty())
 				return ConstIterator<type>{};
@@ -261,7 +264,7 @@ namespace KT
 		}
 
 		template <typename type>
-		typename Vector<type>::constiterator_type Vector<type>::CEnd()
+		typename Vector<type>::const_iterator_type Vector<type>::CEnd()
 		{
 			if (IsEmpty())
 				return ConstIterator<type>{};
@@ -269,7 +272,7 @@ namespace KT
 		}
 
 		template <typename type>
-		typename Vector<type>::reverseIterator_type Vector<type>::RBegin()
+		typename Vector<type>::reverse_iterator_type Vector<type>::RBegin()
 		{
 			if (IsEmpty())
 				return ReverseIterator<type>{};
@@ -277,7 +280,7 @@ namespace KT
 		}
 
 		template <typename type>
-		typename Vector<type>::reverseIterator_type Vector<type>::REnd()
+		typename Vector<type>::reverse_iterator_type Vector<type>::REnd()
 		{
 			if (IsEmpty())
 				return ReverseIterator<type>{};
@@ -285,7 +288,7 @@ namespace KT
 		}
 
 		template <typename type>
-		typename Vector<type>::constreverseIterator_type Vector<type>::CRBegin()
+		typename Vector<type>::const_reverse_Iterator_type Vector<type>::CRBegin()
 		{
 			if (IsEmpty())
 				return ConstReverseIterator<type>{};
@@ -293,7 +296,7 @@ namespace KT
 		}
 
 		template <typename type>
-		typename Vector<type>::constreverseIterator_type Vector<type>::CREnd()
+		typename Vector<type>::const_reverse_Iterator_type Vector<type>::CREnd()
 		{
 			if (IsEmpty())
 				return ConstReverseIterator<type>{};
