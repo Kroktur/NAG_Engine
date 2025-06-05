@@ -2,22 +2,12 @@
 #include <stdexcept>
 #include "RevIterator.h"
 #include "Iterator.h"
+#include "Utility.h"
+
 namespace NAG
 {
 	namespace Math
 	{
-		template<typename type>
-		concept AllIterator = requires()
-		{
-			typename type::Iterator_type;
-		};
-
-		template<typename type>
-		concept AllContainer = requires(type t)
-		{
-			{ t.Begin() };
-			{ t.End() };
-		};
 
 		template<typename type>
 		class Vector
@@ -78,12 +68,12 @@ namespace NAG
 			void Pop_Back();
 			void Assign(const size_t&, const value_type&);
 			void Assign(const std::initializer_list<value_type>&);
-			template<AllIterator IT>
+			template<NAG::Category::Iterator_Category IT>
 			void Assign(const IT&, const IT&);
 			void Insert(const iterator_type&, const value_type&);
 			void Insert(const iterator_type&,const size_t&, const value_type&);
 			void Insert(const iterator_type&,const std::initializer_list<value_type>&);
-			template<AllIterator IT>
+			template<NAG::Category::Iterator_Category IT>
 			void Insert(const iterator_type&, const IT&, const IT&);
 
 			void Erase(const iterator_type&);
@@ -91,7 +81,7 @@ namespace NAG
 			void Erase(const iterator_type&,const size_t& size);
 
 
-			template<AllContainer container>
+			template<NAG::Category::Container_Category container>
 			void AppendRange(const container&);
 			void swap(Vector&);
 
@@ -119,14 +109,14 @@ namespace NAG
 		{
 			reserve(other.Capacity());
 			resize(other.Size());
-			std::copy(other.Begin(), other.End(), m_data);
+			NAG::Algorithm::Copy(other.Begin(), other.End(), m_data);
 		}
 
 		template <typename type>
 		Vector<type>::Vector(const std::initializer_list<type>& list) :m_size(0),m_capacity(0),m_data(nullptr)
 		{
 			resize(list.size());
-			std::copy(list.begin(), list.end(), m_data);
+			NAG::Algorithm::Copy(list.begin(), list.end(), m_data);
 		}
 
 		template <typename type>
@@ -167,11 +157,12 @@ namespace NAG
 			{
 				delete[] m_data;
 				m_data = nullptr;
+				m_capacity = 0;
 				return;
 			}
 			type* new_data = new type[capacity];
-			std::copy(m_data, m_data + m_size, new_data);
-			std::fill(new_data + m_size, new_data + capacity, type{});
+			NAG::Algorithm::Copy(m_data, m_data + m_size, new_data);
+			NAG::Algorithm::Fill(new_data + m_size, new_data + capacity, type{});
 			delete[] m_data;
 			m_data = new_data;
 			m_capacity = capacity;
@@ -286,7 +277,7 @@ namespace NAG
 		Vector<type>& Vector<type>::operator=(const NAG::Math::Vector<type>& other)
 		{
 			resize(other.Size());
-			std::copy(other.Begin(), other.End(), m_data);
+			NAG::Algorithm::Copy(other.Begin(), other.End(), m_data);
 			return *this;
 		}
 
@@ -403,7 +394,7 @@ namespace NAG
 		{
 			Clear();
 			resize(count);
-			std::fill(m_data, m_data + m_size,data);
+			NAG::Algorithm::Fill(m_data, m_data + m_size,data);
 		}
 
 		template <typename type>
@@ -411,11 +402,11 @@ namespace NAG
 		{
 			Clear();
 			resize(list.size());
-			std::copy(list.begin(), list.end(), m_data);
+			NAG::Algorithm::Copy(list.begin(), list.end(), m_data);
 		}
 
 		template <typename type>
-		template <AllIterator IT>
+		template <NAG::Category::Iterator_Category IT>
 		void Vector<type>::Assign(const IT& begin, const IT& end)
 		{
 			Clear();
@@ -466,11 +457,11 @@ namespace NAG
 			{
 				*curent_it = *(curent_it - list.size());
 			}
-			std::copy(list.begin(), list.end(), it);
+			NAG::Algorithm::Copy(list.begin(), list.end(), it);
 		}
 
 		template <typename type>
-		template <AllIterator IT>
+		template <NAG::Category::Iterator_Category IT>
 		void Vector<type>::Insert(const iterator_type& it , const IT& begin, const IT& end)
 		{
 			auto count = end - begin;
@@ -481,7 +472,7 @@ namespace NAG
 			{
 				*curent_it = *(curent_it - count);
 			}
-			std::copy(begin, end, it);
+			NAG::Algorithm::Copy(begin, end, it);
 		}
 
 		template <typename type>
@@ -525,7 +516,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		template <AllContainer container>
+		template <NAG::Category::Container_Category container >
 		void Vector<type>::AppendRange(const container& container)
 		{
 			Insert(End(), container.Begin(), container.End());

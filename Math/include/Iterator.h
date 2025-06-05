@@ -3,7 +3,6 @@ namespace NAG
 {
 	namespace Math
 	{
-	
 		template<typename type>
 		class Iterator
 		{

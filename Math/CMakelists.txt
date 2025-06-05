@@ -9,6 +9,7 @@ set(HEADERS
  ${HEADER_DIR}/Vector.h
  ${HEADER_DIR}/Iterator.h
  ${HEADER_DIR}/RevIterator.h
+ ${HEADER_DIR}/Utility.h
 )
 set(SOURCES
 ${SOURCE_DIR}/TestMath.cpp
