@@ -58,6 +58,6 @@ namespace NAG
 			auto tmp = lhs;
 			lhs = rhs;
 			rhs = tmp;
-		}
+		} 
 	}
 }

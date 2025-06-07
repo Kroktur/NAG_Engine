@@ -13,6 +13,7 @@ namespace NAG
 		class Vector
 		{
 		public:
+
 			using value_type = type;
 			using pointer_type = type*;
 			using const_pointer_type = const type*;
@@ -22,50 +23,44 @@ namespace NAG
 			using iterator_type = NAG::Math::Iterator<type>;
 			using reverse_iterator_type = NAG::Math::ReverseIterator<type>;
 			using const_iterator_type = NAG::Math::ConstIterator<type>;
-			using const_reverse_Iterator_type = NAG::Math::ConstReverseIterator<type>;
+			using const_reverse_iterator_type = NAG::Math::ConstReverseIterator<type>;
+
 			Vector();
 			Vector(const Vector&);
 			Vector(const std::initializer_list<value_type>&);
 			template<typename... Args>
 			Vector(const Args&...);
 			~Vector();
-
-			void resize(const size_t&);
-			void reserve(const size_t&);
+			void Resize(const size_t&);
+			void Reserve(const size_t&);
 			void Clear();
-
 			Vector<type>& operator=(const NAG::Math::Vector<value_type>&);
 			bool operator==(const Vector&) const;
 			bool operator!=(const Vector&) const;
-
 			size_t Size() const;
 			size_t Capacity() const;
 			size_t MaxLimit() const;
 			bool IsEmpty()const;
-
 			reference_type operator[](const size_t&);
-			reference_type at(const size_t&);
+			reference_type At(const size_t&);
 			const_reference_type operator[](const size_t&) const;
-			const_reference_type at(const size_t&)const;
-			reference_type front();
-			reference_type back();
-			const_reference_type front() const;
-			const_reference_type back() const;
-			pointer_type data();
-			const_pointer_type data() const;
-
-
+			const_reference_type At(const size_t&)const;
+			reference_type Front();
+			reference_type Back();
+			const_reference_type Front() const;
+			const_reference_type Back() const;
+			pointer_type Data();
+			const_pointer_type Data() const;
 			iterator_type Begin();
 			iterator_type End();
 			const_iterator_type CBegin();
 			const_iterator_type CEnd();
 			reverse_iterator_type RBegin();
 			reverse_iterator_type REnd();
-			const_reverse_Iterator_type CRBegin();
-			const_reverse_Iterator_type CREnd();
-
-			void Push_Back(const value_type&);
-			void Pop_Back();
+			const_reverse_iterator_type CRBegin();
+			const_reverse_iterator_type CREnd();
+			void PushBack(const value_type&);
+			void PopBack();
 			void Assign(const size_t&, const value_type&);
 			void Assign(const std::initializer_list<value_type>&);
 			template<NAG::Category::Iterator_Category IT>
@@ -75,22 +70,19 @@ namespace NAG
 			void Insert(const iterator_type&,const std::initializer_list<value_type>&);
 			template<NAG::Category::Iterator_Category IT>
 			void Insert(const iterator_type&, const IT&, const IT&);
-
 			void Erase(const iterator_type&);
 			void Erase(const iterator_type&, const iterator_type&);
 			void Erase(const iterator_type&,const size_t& size);
-
-
 			template<NAG::Category::Container_Category container>
 			void AppendRange(const container&);
-			void swap(Vector&);
+			void Swap(Vector&);
 
 		private:
 			template<typename T, typename... Rest>
-			void construct_elements(const size_t& index,  const T& first, const Rest&... rest);
+			void ConstructElements(const size_t& index,  const T& first, const Rest&... rest);
 
 			template<typename T>
-			void construct_elements(const size_t& index, const T& last);
+			void ConstructElements(const size_t& index, const T& last);
 
 			type* m_data;
 			size_t m_size;
@@ -123,7 +115,7 @@ namespace NAG
 		template <typename ... Args>
 		Vector<type>::Vector(const Args&... args):m_size(0),m_capacity(0),m_data(nullptr)
 		{
-			resize(sizeof...(Args));
+			Resize(sizeof...(Args));
 			construct_elements(0,args...);
 		}
 
@@ -135,18 +127,18 @@ namespace NAG
 		}
 
 		template <typename type>
-		void Vector<type>::resize(const size_t& size)
+		void Vector<type>::Resize(const size_t& size)
 		{
 			if (size > m_capacity)
 			{
-				size_t nextsize = std::min(size * 2,MaxLimit());
-				reserve(nextsize);
+				size_t nextsize = NAG::Algorithm::Min(size * 2,MaxLimit());
+				Reserve(nextsize);
 			}
 			m_size = size;
 		}
 
 		template <typename type>
-		void Vector<type>::reserve(const size_t& capacity)
+		void Vector<type>::Reserve(const size_t& capacity)
 		{
 			if (capacity == m_capacity)
 				return;
@@ -201,7 +193,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		typename Vector<type>::reference_type Vector<type>::at(const size_t& index)
+		typename Vector<type>::reference_type Vector<type>::At(const size_t& index)
 		{
 			if (index > m_size - 1)
 				throw std::out_of_range(" index is too big");
@@ -215,7 +207,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		typename Vector<type>::const_reference_type Vector<type>::at(const size_t& index) const
+		typename Vector<type>::const_reference_type Vector<type>::At(const size_t& index) const
 		{
 			if (index > m_size - 1)
 				throw std::out_of_range(" index is too big");
@@ -223,7 +215,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		typename Vector<type>::reference_type Vector<type>::front()
+		typename Vector<type>::reference_type Vector<type>::Front()
 		{
 			if (IsEmpty())
 				throw std::out_of_range("Array is empty");
@@ -231,7 +223,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		typename Vector<type>::reference_type Vector<type>::back()
+		typename Vector<type>::reference_type Vector<type>::Back()
 		{
 			if (IsEmpty())
 				throw std::out_of_range("Array is empty");
@@ -239,7 +231,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		typename Vector<type>::const_reference_type Vector<type>::front() const
+		typename Vector<type>::const_reference_type Vector<type>::Front() const
 		{
 			if (IsEmpty())
 				throw std::out_of_range("Array is empty");
@@ -247,7 +239,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		typename Vector<type>::const_reference_type Vector<type>::back() const
+		typename Vector<type>::const_reference_type Vector<type>::Back() const
 		{
 			if (IsEmpty())
 				throw std::out_of_range("Array is empty");
@@ -255,13 +247,13 @@ namespace NAG
 		}
 
 		template <typename type>
-		typename Vector<type>::pointer_type Vector<type>::data()
+		typename Vector<type>::pointer_type Vector<type>::Data()
 		{
 			return m_data;
 		}
 
 		template <typename type>
-		typename Vector<type>::const_pointer_type Vector<type>::data() const
+		typename Vector<type>::const_pointer_type Vector<type>::Data() const
 		{
 			return m_data;
 		}
@@ -269,8 +261,8 @@ namespace NAG
 		template <typename type>
 		void Vector<type>::Clear()
 		{
-			resize(0);
-			reserve(0);
+			Resize(0);
+			Reserve(0);
 		}
 
 		template <typename type>
@@ -358,7 +350,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		typename Vector<type>::const_reverse_Iterator_type Vector<type>::CRBegin()
+		typename Vector<type>::const_reverse_iterator_type Vector<type>::CRBegin()
 		{
 			if (IsEmpty())
 				return ConstReverseIterator<type>{};
@@ -366,7 +358,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		typename Vector<type>::const_reverse_Iterator_type Vector<type>::CREnd()
+		typename Vector<type>::const_reverse_iterator_type Vector<type>::CREnd()
 		{
 			if (IsEmpty())
 				return ConstReverseIterator<type>{};
@@ -374,26 +366,26 @@ namespace NAG
 		}
 
 		template <typename type>
-		void Vector<type>::Push_Back(const value_type& value)
+		void Vector<type>::PushBack(const value_type& value)
 		{
-			resize(m_size + 1);
+			Resize(m_size + 1);
 			m_data[m_size - 1] = value;
 		}
 
 		template <typename type>
-		void Vector<type>::Pop_Back()
+		void Vector<type>::PopBack()
 		{
 			if (IsEmpty())
 				return;
 			m_data[m_size - 1] = type{};
-			resize(m_size - 1);
+			Resize(m_size - 1);
 		}
 
 		template <typename type>
 		void Vector<type>::Assign(const size_t& count, const value_type& data)
 		{
 			Clear();
-			resize(count);
+			Resize(count);
 			NAG::Algorithm::Fill(m_data, m_data + m_size,data);
 		}
 
@@ -423,7 +415,7 @@ namespace NAG
 		{
 			if (it < Begin() || it > End())
 				throw std::out_of_range("Iterator is invalid");
-			resize(m_size + 1);
+			Resize(m_size + 1);
 			for (auto curent_it = End() - 1; curent_it != it ; --curent_it)
 			{
 				*curent_it = *(curent_it - 1);
@@ -436,7 +428,7 @@ namespace NAG
 		{
 			if (it < Begin() || it > End())
 				throw std::out_of_range("Iterator is invalid");
-			resize(m_size + count);
+			Resize(m_size + count);
 			for (auto curent_it = End() - 1; curent_it != it + count; --curent_it)
 			{
 				*curent_it = *(curent_it - count);
@@ -485,7 +477,7 @@ namespace NAG
 			{
 				*current_it = *(current_it + 1);
 			}
-			resize(m_size - 1);
+			Resize(m_size - 1);
 		}
 
 
@@ -499,7 +491,7 @@ namespace NAG
 			{
 				*current_it = *(current_it + totalsize);
 			}
-			resize(m_size - totalsize);
+			Resize(m_size - totalsize);
 		}
 
 		template <typename type>
@@ -512,7 +504,7 @@ namespace NAG
 			{
 				*current_it = *(current_it + size);
 			}
-			resize(m_size - size);
+			Resize(m_size - size);
 		}
 
 		template <typename type>
@@ -523,7 +515,7 @@ namespace NAG
 		}
 
 		template <typename type>
-		void Vector<type>::swap(Vector& other)
+		void Vector<type>::Swap(Vector& other)
 		{
 			auto tmpdata = m_data;
 			m_data = other.m_data;
@@ -540,7 +532,7 @@ namespace NAG
 
 		template <typename type>
 		template <typename T, typename ... Rest>
-		void Vector<type>::construct_elements(const size_t& index, const T& first, const Rest&... rest)
+		void Vector<type>::ConstructElements(const size_t& index, const T& first, const Rest&... rest)
 		{
 			m_data[index] = first;
 			construct_elements(index + 1,rest...);
@@ -548,7 +540,7 @@ namespace NAG
 
 		template <typename type>
 		template <typename T>
-		void Vector<type>::construct_elements(const size_t& index, const T& last)
+		void Vector<type>::ConstructElements(const size_t& index, const T& last)
 		{
 			m_data[index] = last;
 		}
