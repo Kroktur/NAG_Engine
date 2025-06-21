@@ -10,9 +10,17 @@ set(HEADERS
  ${HEADER_DIR}/Iterator.h
  ${HEADER_DIR}/RevIterator.h
  ${HEADER_DIR}/Utility.h
+ ${HEADER_DIR}/Array.h
+ ${HEADER_DIR}/VectorND.h
+ ${HEADER_DIR}/Vec2.h
+ ${HEADER_DIR}/Vec3.h
+ ${HEADER_DIR}/Matrice.h
+ ${HEADER_DIR}/TestMath.h
+ ${HEADER_DIR}/Angle.h
 )
 set(SOURCES
 ${SOURCE_DIR}/TestMath.cpp
+${SOURCE_DIR}/Angle.cpp
 )
 
 
@@ -21,6 +29,18 @@ add_library(${PROJECT_NAME}
 ${SOURCES}
 ${HEADERS}
 )
-target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})
 
+add_executable(MathTest
+    ${HEADERS}
+    ${SOURCES}
+)
+target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    TestUnits
+)
+target_link_libraries(MathTest
+    PUBLIC
+    TestUnits
+)
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "Math")

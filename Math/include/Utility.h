@@ -1,13 +1,21 @@
 #pragma once
+
 namespace NAG
 {
 	namespace Category
 	{
 		template<typename type>
-		concept Container_Category = requires(type t)
+		concept Acces_Memory_Category = requires(type t)
 		{
 			{ t.Begin() };
 			{ t.End() };
+		};
+
+		template<typename type>
+		concept Container_Category = requires(type t,size_t idx)
+		{
+			{t.Size() };
+			{ t[idx] };
 		};
 
 		template<typename type>
@@ -19,8 +27,8 @@ namespace NAG
 	}
 	namespace Algorithm
 	{
-		template<Category::Iterator_Category IT,typename type>
-		void Fill(const IT& begin , const IT& end,const type& data)
+		template<typename typepointer,typename type>
+		void Fill(const typepointer& begin , const typepointer& end,const type& data)
 		{
 			for (auto it = begin; it != end ; ++it)
 			{
@@ -28,14 +36,25 @@ namespace NAG
 			}
 		}
 
-		template<Category::Iterator_Category IT, typename container>
-		void Copy(const IT& begin, const IT& end, const container& dest)
+		template<typename typepointer, typename container>
+		void Copy(const typepointer& begin, const typepointer& end, const container& dest)
 		{
 			auto curent = dest;
 			for (auto it = begin; it != end; ++it , ++curent)
 			{
 				*curent = *it;
 			}
+		}
+
+		template<typename typepointer, typename type>
+		typepointer Find(const typepointer& begin,const typepointer& end, const type& data)
+		{
+			for (auto it = begin ; it != end; ++it)
+			{
+				if (*it == data)
+					return it;
+			}
+			return end;
 		}
 
 		template<typename type>
@@ -58,6 +77,14 @@ namespace NAG
 			auto tmp = lhs;
 			lhs = rhs;
 			rhs = tmp;
-		} 
+		}
+		template<typename type>
+		bool IsEqual(const type& lhs,const type& rhs,const type& epsilon = 1.19209e-07f)
+		{
+			auto result = NAG::Algorithm::Max(lhs - rhs, rhs - lhs);
+			if (result <= epsilon)
+				return true;
+			return false;
+		}
 	}
 }

@@ -99,7 +99,7 @@ namespace NAG
 		ReverseIterator<type> ReverseIterator<type>::operator++(int)
 		{
 			ReverseIterator tmp = *this;
-			--(*this);
+			++(*this);
 			return tmp;
 		}
 
@@ -107,7 +107,7 @@ namespace NAG
 		ReverseIterator<type> ReverseIterator<type>::operator--(int)
 		{
 			ReverseIterator tmp = *this;
-			++(*this);
+			--(*this);
 			return tmp;
 		}
 
@@ -302,7 +302,7 @@ template <typename type>
 ConstReverseIterator<type> ConstReverseIterator<type>::operator++(int)
 {
 	ConstReverseIterator tmp = *this;
-	--(*this);
+	++(*this);
 	return tmp;
 }
 
@@ -310,7 +310,7 @@ template <typename type>
 ConstReverseIterator<type> ConstReverseIterator<type>::operator--(int)
 {
 	ConstReverseIterator tmp = *this;
-	++(*this);
+	--(*this);
 	return tmp;
 }
 

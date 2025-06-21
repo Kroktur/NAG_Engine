@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Array.h"
 #include "Vector.h"
 
 int main(int argc, char** argv)
@@ -11,5 +12,8 @@ int main(int argc, char** argv)
     test2.Resize(test.Size());
     NAG::Algorithm::Copy(test.Begin(), test.End(), test2.Begin());
     std::cout <<  test2[4];
+
+
+    NAG::Math::Array<int, 4> test4{ 1,2,3,4 };
     return 0;
 }
