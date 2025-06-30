@@ -17,6 +17,7 @@ set(HEADERS
  ${HEADER_DIR}/Matrice.h
  ${HEADER_DIR}/TestMath.h
  ${HEADER_DIR}/Angle.h
+ ${HEADER_DIR}/Pair.h
 )
 set(SOURCES
 ${SOURCE_DIR}/TestMath.cpp

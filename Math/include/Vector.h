@@ -9,7 +9,7 @@ namespace NAG
 	namespace Math
 	{
 
-		template<typename type>
+		template<Concept::DefaultConstructorType type>
 		class Vector
 		{
 		public:
@@ -28,7 +28,7 @@ namespace NAG
 			Vector();
 			Vector(const Vector&);
 			Vector(const std::initializer_list<value_type>&);
-			template<typename... Args>
+			template<Concept::DefaultConstructorType... Args> requires Concept::IsConvertible<type, Args...>
 			Vector(const Args&...);
 			~Vector();
 			void Resize(const size_t&);
@@ -92,11 +92,11 @@ namespace NAG
 			void Swap(Vector&);
 
 		private:
-			template<typename T, typename... Rest>
-			void ConstructElements(const size_t& index,  const T& first, const Rest&... rest);
+			template<typename type2, typename... Rest>
+			void ConstructElements(const size_t& index,  const type2& first, const Rest&... rest);
 
-			template<typename T>
-			void ConstructElements(const size_t& index, const T& last);
+			template<typename type2>
+			void ConstructElements(const size_t& index, const type2& last);
 
 			type* m_data;
 			size_t m_size;
@@ -105,12 +105,12 @@ namespace NAG
 
 	
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		Vector<type>::Vector():m_size(0),m_capacity(0),m_data(nullptr)
 		{
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		Vector<type>::Vector( const Vector& other):m_size(0),m_capacity(0),m_data(nullptr)
 		{
 			Reserve(other.Capacity());
@@ -118,22 +118,22 @@ namespace NAG
 			NAG::Algorithm::Copy(other.Begin(), other.End(), m_data);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		Vector<type>::Vector(const std::initializer_list<type>& list) :m_size(0),m_capacity(0),m_data(nullptr)
 		{
 			Resize(list.size());
 			std::copy(list.begin(), list.end(), m_data);
 		}
 
-		template <typename type>
-		template <typename ... Args>
+		template <Concept::DefaultConstructorType type>
+		template <Concept::DefaultConstructorType ... Args> requires Concept::IsConvertible<type, Args...>
 		Vector<type>::Vector(const Args&... args):m_size(0),m_capacity(0),m_data(nullptr)
 		{
 			Resize(sizeof...(Args));
 			ConstructElements(0,args...);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		Vector<type>::~Vector()
 		{
 			Clear();
@@ -144,7 +144,7 @@ namespace NAG
 			}
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		void Vector<type>::Resize(const size_t& size)
 		{
 			if (size > m_capacity)
@@ -155,7 +155,7 @@ namespace NAG
 			m_size = size;
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		void Vector<type>::Reserve(const size_t& capacity)
 		{
 			if (capacity == m_capacity)
@@ -175,25 +175,25 @@ namespace NAG
 			m_capacity = capacity;
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		size_t Vector<type>::Size() const
 		{
 			return  m_size;
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		size_t Vector<type>::Capacity() const
 		{
 			return m_capacity;
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		size_t Vector<type>::MaxLimit() const
 		{
 			return std::numeric_limits<size_t>::max() / sizeof(type);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		bool Vector<type>::IsEmpty() const
 		{
 			if (m_size == 0)
@@ -201,13 +201,13 @@ namespace NAG
 			return false;
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::reference_type Vector<type>::operator[](const size_t& index)
 		{
 			return m_data[index];
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::reference_type Vector<type>::At(const size_t& index)
 		{
 			if (index > m_size - 1)
@@ -215,13 +215,13 @@ namespace NAG
 			return m_data[index];
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_reference_type Vector<type>::operator[](const size_t& index) const
 		{
 			return m_data[index];
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_reference_type Vector<type>::At(const size_t& index) const
 		{
 			if (index > m_size - 1)
@@ -229,7 +229,7 @@ namespace NAG
 			return m_data[index];
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::reference_type Vector<type>::Front()
 		{
 			if (IsEmpty())
@@ -237,7 +237,7 @@ namespace NAG
 			return m_data[0];
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::reference_type Vector<type>::Back()
 		{
 			if (IsEmpty())
@@ -245,7 +245,7 @@ namespace NAG
 			return m_data[m_size - 1];
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_reference_type Vector<type>::Front() const
 		{
 			if (IsEmpty())
@@ -253,7 +253,7 @@ namespace NAG
 			return m_data[0];
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_reference_type Vector<type>::Back() const
 		{
 			if (IsEmpty())
@@ -261,7 +261,7 @@ namespace NAG
 			return m_data[m_size - 1];
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::pointer_type Vector<type>::Data()
 		{
 			if (IsEmpty())
@@ -269,7 +269,7 @@ namespace NAG
 			return m_data;
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_pointer_type Vector<type>::Data() const
 		{
 			if (IsEmpty())
@@ -277,14 +277,14 @@ namespace NAG
 			return m_data;
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		void Vector<type>::Clear()
 		{
 			Resize(0);
 			Reserve(0);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		Vector<type>& Vector<type>::operator=(const Vector& other)
 		{
 			if (this == &other)
@@ -295,7 +295,7 @@ namespace NAG
 			return *this;
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		bool Vector<type>::operator==(const Vector& other) const
 		{
 			if (m_size != other.Size())
@@ -308,7 +308,7 @@ namespace NAG
 			return true;
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		bool Vector<type>::operator!=(const Vector& other) const
 		{
 			if (m_size != other.Size())
@@ -322,7 +322,7 @@ namespace NAG
 		}
 
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::iterator_type Vector<type>::Begin()
 		{
 			if (IsEmpty())
@@ -331,7 +331,7 @@ namespace NAG
 		}
 
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::iterator_type Vector<type>::End()
 		{
 			if (IsEmpty())
@@ -339,7 +339,7 @@ namespace NAG
 			return Iterator<type>(m_data + m_size);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_iterator_type Vector<type>::Begin() const
 		{
 			if (IsEmpty())
@@ -347,7 +347,7 @@ namespace NAG
 			return ConstIterator<type>(m_data);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_iterator_type Vector<type>::End() const
 		{
 			if (IsEmpty())
@@ -355,7 +355,7 @@ namespace NAG
 			return ConstIterator<type>(m_data + m_size);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_iterator_type Vector<type>::CBegin() const 
 		{
 			if (IsEmpty())
@@ -363,7 +363,7 @@ namespace NAG
 			return ConstIterator<type>(m_data);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_iterator_type Vector<type>::CEnd() const 
 		{
 			if (IsEmpty())
@@ -371,7 +371,7 @@ namespace NAG
 			return ConstIterator<type>(m_data + m_size);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::reverse_iterator_type Vector<type>::RBegin()
 		{
 			if (IsEmpty())
@@ -379,7 +379,7 @@ namespace NAG
 			return ReverseIterator<type>(m_data + m_size - 1);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::reverse_iterator_type Vector<type>::REnd()
 		{
 			if (IsEmpty())
@@ -387,7 +387,7 @@ namespace NAG
 			return ReverseIterator<type>(m_data - 1);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_reverse_iterator_type Vector<type>::RBegin() const
 		{
 			if (IsEmpty())
@@ -395,7 +395,7 @@ namespace NAG
 			return ConstReverseIterator<type>(m_data + m_size - 1);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_reverse_iterator_type Vector<type>::REnd() const
 		{
 			if (IsEmpty())
@@ -403,7 +403,7 @@ namespace NAG
 			return ConstReverseIterator<type>(m_data - 1);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_reverse_iterator_type Vector<type>::CRBegin() const
 		{
 			if (IsEmpty())
@@ -411,7 +411,7 @@ namespace NAG
 			return ConstReverseIterator<type>(m_data + m_size - 1);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		typename Vector<type>::const_reverse_iterator_type Vector<type>::CREnd() const 
 		{
 			if (IsEmpty())
@@ -419,14 +419,14 @@ namespace NAG
 			return ConstReverseIterator<type>(m_data - 1);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		void Vector<type>::PushBack(const value_type& value)
 		{
 			Resize(m_size + 1);
 			m_data[m_size - 1] = value;
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		void Vector<type>::PopBack()
 		{
 			if (IsEmpty())
@@ -435,7 +435,7 @@ namespace NAG
 			Resize(m_size - 1);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		void Vector<type>::Assign(const size_t& count, const value_type& data)
 		{
 			Clear();
@@ -443,7 +443,7 @@ namespace NAG
 			NAG::Algorithm::Fill(m_data, m_data + m_size,data);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		void Vector<type>::Assign(const std::initializer_list<value_type>& list)
 		{
 			Clear();
@@ -451,7 +451,7 @@ namespace NAG
 			NAG::Algorithm::Copy(list.begin(), list.end(), m_data);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		template <NAG::Category::Iterator_Category IT>
 		void Vector<type>::Assign(const IT& begin, const IT& end)
 		{
@@ -464,7 +464,7 @@ namespace NAG
 			}
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		template <NAG::Category::Iterator_Category IT>
 		void Vector<type>::Insert(const IT& it, const value_type& data)
 		{
@@ -487,7 +487,7 @@ namespace NAG
 			*newptr = data;
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		template <NAG::Category::Iterator_Category IT>
 		void Vector<type>::Insert(const IT& it, const size_t& count, const value_type& data)
 		{
@@ -511,7 +511,7 @@ namespace NAG
 			}
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		template <NAG::Category::Iterator_Category IT>
 		void Vector<type>::Insert(const IT& it, const std::initializer_list<value_type>& list)
 		{
@@ -533,7 +533,7 @@ namespace NAG
 			NAG::Algorithm::Copy(list.begin(), list.end(), newptr);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		template <NAG::Category::Iterator_Category IT, NAG::Category::Iterator_Category IT2>
 		void Vector<type>::Insert(const IT& it, const IT2& begin, const IT2& end)
 		{
@@ -554,7 +554,7 @@ namespace NAG
 			NAG::Algorithm::Copy(begin, end, newptr);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		template <NAG::Category::Iterator_Category IT>
 		void Vector<type>::Erase(const IT& it)
 		{
@@ -571,7 +571,7 @@ namespace NAG
 			Resize(m_size - 1);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		template <NAG::Category::Iterator_Category IT>
 		void Vector<type>::Erase(const IT& begin, const IT& end)
 		{
@@ -592,7 +592,7 @@ namespace NAG
 			Resize(m_size - count);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		template<NAG::Category::Iterator_Category IT>
 		void Vector<type>::Erase(const IT& it, const size_t& size)
 		{
@@ -610,7 +610,7 @@ namespace NAG
 			Resize(m_size - size);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		template <NAG::Category::Acces_Memory_Category container >
 		void Vector<type>::AppendRange(const container& contain)
 		{
@@ -620,7 +620,7 @@ namespace NAG
 			NAG::Algorithm::Copy(contain.Begin(), contain.End(), m_data + lastsize);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		template <NAG::Category::Iterator_Category IT, NAG::Category::Acces_Memory_Category container>
 		void Vector<type>::InsertRange(const IT& it, const container& contain)
 		{
@@ -642,7 +642,7 @@ namespace NAG
 			NAG::Algorithm::Copy(contain.Begin(), contain.End(), newptr);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		template <NAG::Category::Acces_Memory_Category container>
 		void Vector<type>::AssignRange(const container& contain)
 		{
@@ -651,7 +651,7 @@ namespace NAG
 			NAG::Algorithm::Copy(contain.Begin(), contain.End(), m_data);
 		}
 
-		template <typename type>
+		template <Concept::DefaultConstructorType type>
 		void Vector<type>::Swap(Vector& other)
 		{
 			auto tmpdata = m_data;
@@ -667,23 +667,23 @@ namespace NAG
 			other.m_size = tmpsize;
 		}
 
-		template <typename type>
-		template <typename T, typename ... Rest>
-		void Vector<type>::ConstructElements(const size_t& index, const T& first, const Rest&... rest)
+		template <Concept::DefaultConstructorType type>
+		template <typename type2, typename ... Rest>
+		void Vector<type>::ConstructElements(const size_t& index, const type2& first, const Rest&... rest)
 		{
-			m_data[index] = first;
+			m_data[index] = static_cast<type>(first);
 			ConstructElements(index + 1,rest...);
 		}
 
-		template <typename type>
-		template <typename T>
-		void Vector<type>::ConstructElements(const size_t& index, const T& last)
+		template <Concept::DefaultConstructorType type>
+		template <typename type2>
+		void Vector<type>::ConstructElements(const size_t& index, const type2& last)
 		{
-			m_data[index] = last;
+			m_data[index] = static_cast<type>(last);
 		}
 	}
 }
-template<typename type>
+template<NAG::Concept::DefaultConstructorType type>
 std::ostream& operator<<(std::ostream& os, const NAG::Math::Vector< type>& vector)
 {
 	os << "Vec: ";

@@ -5,6 +5,7 @@
 #include "../include/Array.h"
 #include "../include/Iterator.h"
 #include "../include/Matrice.h"
+#include "../include/Pair.h"
 #include "../include/Vec2.h"
 #include "../include/Vec3.h"
 using namespace NAG::Unit;
@@ -331,11 +332,11 @@ int main()
 		{
 			ReturnTest<float, 2> result;
 			result.name = "Test Rad";
-			auto angle = NAG::Math::Radiant<float, NAG::Math::SignedInterval>(3.f / 4 * NAG::Math::PI);
-			result.data[0].value = angle.AsDegrees();
-			result.data[0].expected_value = -1.f / 2 * NAG::Math::PI;
+			auto angle = NAG::Math::Radiant<float, NAG::Math::SignedInterval<float>>(7.f / 4 * NAG::Math::PI);
+			result.data[0].value = NAG::Algorithm::IsEqual(angle.AsRadians(), -0.25f * NAG::Math::PI);
+			result.data[0].expected_value = true;
 			auto angle2 = NAG::Math::Degree(360.f);
-			result.data[1].value = angle2.AsDegrees();
+			result.data[1].value = angle2.AsRadians();
 			result.data[1].expected_value = 0;
 			return result;
 		});
@@ -411,10 +412,10 @@ int main()
 		{
 			ReturnTest<float, 2> result;
 			result.name = "Test Interval Change";
-			auto angle = NAG::Math::Degree(270.f);
+			auto angle = NAG::Math::Degree<float, NAG::Math::SignedInterval<float>>(270.f);
 			result.data[0].value = angle.AsDegrees();
-			result.data[0].expected_value = 270;
-			auto angle2 = angle.ChangeInterval<NAG::Math::SignedInterval>();
+			result.data[0].expected_value = -90;
+			auto angle2 = angle.ChangeIntervalCopy<NAG::Math::SignedInterval<float>>();
 			result.data[1].value = angle2.AsDegrees();
 			result.data[1].expected_value = -90;
 			return result;
@@ -1033,8 +1034,8 @@ int main()
 		 {
 			 ReturnTest<float,8> result;
 			 result.name = "operator incrementation";
-			 NAG::Math::VectorND<float, 3> vnd(1, 2, 3);
-			 NAG::Math::VectorND<float, 3> vnd2(2, 2, 2);
+			 NAG::Math::VectorND<float, 3> vnd(1.f, 2.f, 3.f);
+			 NAG::Math::VectorND<float, 3> vnd2(2.f, 2.f, 2.f);
 			 result.data[0].value =(vnd2 + vnd)[0];
 			 result.data[0].expected_value = 3;
 			 result.data[1].value = (vnd2 - vnd)[0];
@@ -1061,7 +1062,7 @@ int main()
 		 {
 			 ReturnTest<float, 1> result;
 			 result.name = "Norm";
-			 NAG::Math::VectorND<float, 3> vnd(1, 2,2);
+			 NAG::Math::VectorND<float, 3> vnd(1.f, 2.f,2.f);
 			 result.data[0].value = vnd.Norm();
 			 result.data[0].expected_value = 3;
 			 return result;
@@ -1280,7 +1281,7 @@ int main()
 		 {
 			 ReturnTest<bool, 1> result;
 			 result.name = "MatrixProduct";
-			 NAG::Math::Matrix<float,2,3> matrix(1,2,3,4,5,6);
+			 NAG::Math::Matrix<float,2,3> matrix(1.f,2.f,3.f,4.f,5.f,6.f);
 			 NAG::Math::Matrix<float, 3, 2> matrix2(7,8,9,10,11,12);
 			 auto cross = matrix.MatrixProduct(matrix2);
 			 NAG::Math::Matrix<float, 2> matrix3(58, 64, 139, 154);
@@ -1290,9 +1291,9 @@ int main()
 		 });
 	 Matrixtest.RunTest();
 	 TestUnits Utility("Utility");
-	 Utility.AddTest<float,7>([]()->ReturnTest<float, 7>
+	 Utility.AddTest<float,9>([]()->ReturnTest<float, 9>
 		 {
-			 ReturnTest<float,7> result;
+			 ReturnTest<float,9> result;
 			 result.name = "Utility";
 			 NAG::Math::Array<float, 4> array;
 			 NAG::Algorithm::Fill(array.Begin(), array.End(), 5);
@@ -1319,10 +1320,58 @@ int main()
 			 result.data[5].expected_value = 6;
 			 result.data[6].value = NAG::Algorithm::IsEqual(min,max,2.f) == true;
 			 result.data[6].expected_value = 1;
+			 int minint = 3;
+			 int maxint = 6;
+			 int dataint = 20;
+			 result.data[7].value = NAG::Algorithm::Clamp(minint,maxint,dataint);
+			 result.data[7].expected_value = 6;
+			 result.data[8].value = NAG::Algorithm::IsClamp(minint, maxint, dataint);
+			 result.data[8].expected_value = 0;
 			 return result;
 		 });
-	 auto angle = NAG::Math::Degree<float>(90);
-	 std::cout << angle;
 	 Utility.RunTest();
+	 TestUnits Pair("Pair");
+	 Pair.AddTest<bool, 4>([]()->ReturnTest<bool,4>
+		 {
+			 ReturnTest<bool, 4> result;
+			 result.name = "Constructor";
+			 NAG::Math::Pair<float, bool> pair;
+	 		 result.data[0].value = typeid( pair.rhsdata).name() == typeid(bool).name();
+			 result.data[0].expected_value =true;
+			 pair.rhsdata = false;
+			 NAG::Math::Pair<float, bool> pair2(pair);
+			 result.data[1].value = pair2.rhsdata == true;
+			 result.data[1].expected_value = false;
+			 NAG::Math::Pair<float, bool> pair3{ 3.f,true };
+			 result.data[2].value = pair3.lhsdata == 3.f;
+			 result.data[2].expected_value = true;
+			 NAG::Math::Pair<float, bool> pair4(1, 0);
+			 result.data[3].value = typeid(pair4.rhsdata).name() == typeid(bool).name();
+			 result.data[3].expected_value = true;
+			 return result;
+		 });
+	 Pair.AddTest<bool,1>([]()->ReturnTest<bool, 1>
+		 {
+			 ReturnTest<bool, 1> result;
+			 result.name = "Clear";
+			 NAG::Math::Pair<float, bool> pair(30.f,true);
+			 pair.Clear();
+			 result.data[0].value = pair.rhsdata == float{};
+			 result.data[0].expected_value = true;
+			 return result;
+		 });
+	 Pair.AddTest<bool, 1>([]()->ReturnTest<bool, 1>
+		 {
+			 ReturnTest<bool, 1> result;
+			 result.name = "SwapType";
+			 NAG::Math::Pair<float, bool> pair(30.f, true);
+			 auto pair2 = pair.SwapType();
+			 result.data[0].value = pair2.lhsdata == pair.rhsdata;
+			 result.data[0].expected_value = true;
+			 return result;
+		 });
+	 Pair.RunTest();
+	 int toto = 0;
+	 toto += 1;
 	return 0;
 }

@@ -5,7 +5,8 @@ namespace NAG
 {
 	namespace Math
 	{
-		template<typename type, size_t height,size_t width = height>
+
+		template<Concept::AllOpAlgo type, size_t height, size_t width = height> requires Concept::MinValue<1,height,width> && Concept::DefaultConstructorType<type>
 		class Matrix
 		{
 		public:
@@ -17,9 +18,10 @@ namespace NAG
 			Matrix();
 			Matrix(const Matrix&);
 			Matrix(const std::initializer_list <type>&);
-			template<typename... Args>
+			template<Concept::AllOpAlgo... Args> requires Concept::IsConvertible<type,Args...> && Concept::DefaultConstructorType<Args...>
 			Matrix(const Args&...);
 			~Matrix() = default;
+			void Clear();
 			Matrix& operator=(const Matrix&);
 			bool operator==(const Matrix&) const;
 			bool operator!=(const Matrix&) const;
@@ -42,37 +44,43 @@ namespace NAG
 			Matrix& operator *=(const type&);
 			Matrix& operator /=(const type&);
 			bool IsZero() const;
-			template<size_t otherwidth>
+			template<size_t otherwidth>requires Concept::MinValue<1, otherwidth>
 			Matrix<type, height, otherwidth> MatrixProduct(const Matrix<type, width, otherwidth>&);
 		private:
 			Array < type, width* height> m_data;
 		};
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width>::Matrix() : m_data()
 		{
 
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width>::Matrix(const Matrix& other) :m_data(other.m_data)
 		{
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width>::Matrix(const std::initializer_list<type>& list) :m_data(list)
 		{
 
 		}
 
-		template <typename type, size_t height, size_t width>
-		template<typename... Args>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
+		template<Concept::AllOpAlgo... Args> requires Concept::IsConvertible<type, Args...> && Concept::DefaultConstructorType<Args...>
 		Matrix<type, height, width>::Matrix(const Args&... arg):m_data(arg...)
 		{
 
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width> requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
+		void Matrix<type, height, width>::Clear()
+		{
+			m_data.Clear();
+		}
+
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width>& Matrix<type, height, width>::operator=(const Matrix& other)
 		{
 			if (this == &other)
@@ -81,37 +89,37 @@ namespace NAG
 			return *this;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		bool Matrix<type, height, width>::operator==(const Matrix& other) const
 		{
 			return m_data == other.m_data;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		bool Matrix<type, height, width>::operator!=(const Matrix& other) const
 		{
 			return m_data != other.m_data;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		size_t Matrix<type, height, width>::Size() const
 		{
 			return m_data.Size();
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		size_t Matrix<type, height, width>::Height() const
 		{
 			return height;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		size_t Matrix<type, height, width>::Width() const
 		{
 			return width;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		size_t Matrix<type, height, width>::GetCellIndex(const size_t& row, const size_t& col) const
 		{
 			auto index = row * width + col;
@@ -120,45 +128,45 @@ namespace NAG
 			return index;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		typename Matrix<type, height, width>::reference_type Matrix<type, height, width>::GetCell(const size_t& row,
 			const size_t& col)
 		{
 			return m_data[GetCellIndex(row, col)];
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		typename Matrix<type, height, width>::const_reference_type Matrix<type, height, width>::GetCell(const size_t& row,
 			const size_t& col) const
 		{
 			return m_data[GetCellIndex(row, col)];
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		typename Matrix<type, height, width>::reference_type Matrix<type, height, width>::operator[](const size_t& index)
 		{
 			return m_data[index];
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		typename Matrix<type, height, width>::reference_type Matrix<type, height, width>::At(const size_t& index)
 		{
 			return m_data.At(index);
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		typename Matrix<type, height, width>::const_reference_type Matrix<type, height, width>::operator[](const size_t& index) const
 		{
 			return m_data[index];
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		typename Matrix<type, height, width>::const_reference_type Matrix<type, height, width>::At(const size_t& index) const
 		{
 			return m_data.At(index);
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width> Matrix<type, height, width>::operator+(const Matrix& other) const
 		{
 			Matrix result;
@@ -169,7 +177,7 @@ namespace NAG
 			return  result;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width> Matrix<type, height, width>::operator-(const Matrix& other) const
 		{
 			Matrix result;
@@ -180,7 +188,7 @@ namespace NAG
 			return  result;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width>& Matrix<type, height, width>::operator+=(const Matrix& other)
 		{
 			for (size_t i = 0; i < Size(); ++i)
@@ -190,7 +198,7 @@ namespace NAG
 			return  *this;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width>& Matrix<type, height, width>::operator-=(const Matrix& other)
 		{
 			for (size_t i = 0; i < Size(); ++i)
@@ -200,7 +208,7 @@ namespace NAG
 			return  *this;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width> Matrix<type, height, width>::operator*(const type& scalar) const
 		{
 			Matrix result;
@@ -211,7 +219,7 @@ namespace NAG
 			return result;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width> Matrix<type, height, width>::operator/(const type& scalar) const
 		{
 			if (scalar == 0)
@@ -225,7 +233,7 @@ namespace NAG
 			return  result;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width>& Matrix<type, height, width>::operator*=(const type& scalar)
 		{
 			for (size_t i = 0; i < Size(); ++i)
@@ -235,7 +243,7 @@ namespace NAG
 			return *this;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		Matrix<type, height, width>& Matrix<type, height, width>::operator/=(const type& scalar)
 		{
 			if (scalar == 0)
@@ -248,7 +256,7 @@ namespace NAG
 			return  *this;
 		}
 
-		template <typename type, size_t height, size_t width>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
 		bool Matrix<type, height, width>::IsZero() const
 		{
 			for (size_t i = 0; i < Size(); ++i)
@@ -259,8 +267,8 @@ namespace NAG
 			return true;
 		}
 
-		template <typename type, size_t height, size_t width>
-		template <size_t otherwidth>
+		template <Concept::AllOpAlgo type, size_t height, size_t width>requires Concept::MinValue<1, height, width>&& Concept::DefaultConstructorType<type>
+		template <size_t otherwidth> requires Concept::MinValue<1,otherwidth>
 		Matrix<type, height, otherwidth> Matrix<type, height, width>::MatrixProduct(
 			const Matrix<type, width, otherwidth>& other)
 		{
@@ -281,7 +289,7 @@ namespace NAG
 
 	}
 }
-template<typename type,size_t height, size_t width = height>
+template<NAG::Concept::AllOpAlgo type,size_t height, size_t width = height>
 std::ostream& operator<<(std::ostream& os, const NAG::Math::Matrix<type,height,width>& contain)
 {
 	os << "Max: " << std::endl;

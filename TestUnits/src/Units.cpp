@@ -12,7 +12,7 @@ void NAG::Unit::TestUnits::RunTest()
 	for (auto test : m_tests)
 	{
 		auto result = test();
-		if (!result && allTestOk.first == true)
+		if (!result)
 		{
 			allTestOk.first = false;
 			allTestOk.second += 1;

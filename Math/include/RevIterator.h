@@ -30,9 +30,7 @@ namespace NAG
 			bool operator>=(const ReverseIterator&) const;
 			bool operator<=(const ReverseIterator&) const;
 			ReverseIterator& operator=(const ReverseIterator&);
-			ReverseIterator operator+(const difference_type&);
 			ReverseIterator operator+(const difference_type&) const;
-			ReverseIterator operator-(const difference_type&);
 			ReverseIterator operator-(const difference_type&) const;
 			ReverseIterator& operator+=(const difference_type&);
 			ReverseIterator& operator-=(const difference_type&);
@@ -158,21 +156,9 @@ namespace NAG
 		}
 
 		template <typename type>
-		ReverseIterator<type> ReverseIterator<type>::operator+(const difference_type& index)
-		{
-			return ReverseIterator(m_data - index);
-		}
-
-		template <typename type>
 		ReverseIterator<type> ReverseIterator<type>::operator+(const difference_type& index) const
 		{
 			return ReverseIterator(m_data - index);
-		}
-
-		template <typename type>
-		ReverseIterator<type> ReverseIterator<type>::operator-(const difference_type& index)
-		{
-			return ReverseIterator(m_data + index);
 		}
 
 		template <typename type>
@@ -233,9 +219,7 @@ public:
 	bool operator>=(const ConstReverseIterator&) const;
 	bool operator<=(const ConstReverseIterator&) const;
 	ConstReverseIterator& operator=(const ConstReverseIterator&);
-	ConstReverseIterator operator+(const difference_type&);
 	ConstReverseIterator operator+(const difference_type&) const;
-	ConstReverseIterator operator-(const difference_type&);
 	ConstReverseIterator operator-(const difference_type&) const;
 	ConstReverseIterator& operator+=(const difference_type&);
 	ConstReverseIterator& operator-=(const difference_type&);
@@ -359,23 +343,10 @@ ConstReverseIterator<type>& ConstReverseIterator<type>::operator=(const ConstRev
 	m_data = it.m_data;
 	return *this;
 }
-
-template <typename type>
-ConstReverseIterator<type> ConstReverseIterator<type>::operator+(const difference_type& index)
-{
-	return ConstReverseIterator(m_data - index);
-}
-
 template <typename type>
 ConstReverseIterator<type> ConstReverseIterator<type>::operator+(const difference_type& index) const
 {
 	return ConstReverseIterator(m_data - index);
-}
-
-template <typename type>
-ConstReverseIterator<type> ConstReverseIterator<type>::operator-(const difference_type& index)
-{
-	return ConstReverseIterator(m_data + index);
 }
 
 template <typename type>

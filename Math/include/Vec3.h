@@ -4,7 +4,7 @@ namespace NAG
 {
 	namespace Math
 	{
-		template<typename type>
+		template<Concept::AllOpAlgo type>requires Concept::DefaultConstructorType<type>
 		class Vec3 : public VectorND<type, 3>
 		{
 		public:
@@ -23,22 +23,22 @@ namespace NAG
 			Vec3 Cross(const Vec3&) const;
 		};
 
-		template <typename type>
+		template <Concept::AllOpAlgo type>requires Concept::DefaultConstructorType<type>
 		Vec3<type>::Vec3() : VectorND<type, 3>(), x(this->m_data[0]),y(this->m_data[1]),z(this->m_data[2])
 		{
 		}
 
-		template <typename type>
+		template <Concept::AllOpAlgo type>requires Concept::DefaultConstructorType<type>
 		Vec3<type>::Vec3(const type& x_, const type& y_, const type& z_) : VectorND<type, 3>(x_, y_, z_), x(this->m_data[0]), y(this->m_data[1]), z(this->m_data[2])
 		{
 		}
 
-		template <typename type>
+		template <Concept::AllOpAlgo type>requires Concept::DefaultConstructorType<type>
 		Vec3<type>::Vec3(const Vec3& other) : VectorND<type, 3>(other.x,other.y,other.z), x(this->m_data[0]), y(this->m_data[1]), z(this->m_data[2])
 		{
 		}
 
-		template <typename type>
+		template <Concept::AllOpAlgo type>requires Concept::DefaultConstructorType<type>
 		Vec3<type> Vec3<type>::Cross(const Vec3& other) const
 		{
 			return Vec3{
@@ -48,7 +48,7 @@ namespace NAG
 		}
 	}
 }
-template<typename type>
+template<NAG::Concept::AllOpAlgo type>
 std::ostream& operator<<(std::ostream& os, const NAG::Math::Vec3 < type>& vec3)
 {
 	os << "Vec3: ";

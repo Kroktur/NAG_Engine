@@ -1,210 +1,260 @@
 #pragma once
 #include <stdexcept>
 #include <iostream>
-#include <cmath> 
+#include <cmath>
+#include "Utility.h"
 namespace NAG
 {
 	namespace Math
 	{
 		static constexpr float PI = 3.141592f;
-		template<typename type>
-		class IAngleInterval
+
+		template<NAG::Concept::FloatingType type>
+		class AngleInterval
 		{
 		public:
-			IAngleInterval(const float&, const float&);
-			virtual ~IAngleInterval() = default;
-			virtual type Normalize(const type&) const = 0;
+			AngleInterval(const type& min, const type& max);
+			AngleInterval(const AngleInterval& other);
+			virtual ~AngleInterval() = default;
+			type GetMin() const;
+			type GetMax() const;
+			type Normalize(const type& radiant) const;
+			type Normalize(type& radiant);
+			template<NAG::Concept::FloatingType type2>
+			static bool IsInInterval(const type2& min, const type2& max, const AngleInterval<type2>& interval);
 		private:
-			float m_min;
-			float m_max;
+			type m_min;
+			type m_max;
 		};
+		
 
-		template<typename type>
-		class UnsignedInterval : public IAngleInterval<type>
+		template<NAG::Concept::FloatingType type>
+		class UnsignedInterval :public AngleInterval<type>
 		{
 		public:
 			UnsignedInterval();
-			type Normalize(const type&) const override;
 		};
-		template<typename type>
-		class SignedInterval : public IAngleInterval<type>
+
+		template<NAG::Concept::FloatingType type>
+		class SignedInterval :public AngleInterval<type>
 		{
 		public:
 			SignedInterval();
-			type Normalize(const type&) const override;
 		};
 
-		template<typename ,typename type>
-		concept AngleInterval = requires{};
 
-
-		template<typename type = float, AngleInterval Interval = UnsignedInterval<type>>
+		template<NAG::Concept::FloatingType type = float, NAG::Concept::DerivedClass<AngleInterval<type>> Interval = UnsignedInterval<type>> requires Concept::AllOpAlgo<type>
 		class Angle
 		{
 		public:
-			friend Angle<type, Interval> Degree<type,Interval>(const type&);
-			friend Angle<type, Interval> Radiant<type, Interval>(const type&);
+			friend Angle<type, Interval> Degree<type, Interval>(const type&);
+			friend Angle< type, Interval> Radiant<type, Interval>(const type&);
 			using value_type = type;
+			using const_reference_type = const type&;
 			using angle_type = Interval;
 			Angle();
-			~Angle();
+			~Angle() = default;
 			Angle(const Angle& other);
+
 			type AsRadians();
+
 			type AsRadians() const;
-			type AsDegrees(); 
+
+			type AsDegrees();
+
 			type AsDegrees() const;
-			Angle& operator=(const Angle&);
-			Angle operator+(const Angle&) const;
-			Angle operator-(const Angle&) const;
-			Angle& operator +=(const Angle&);
-			Angle& operator -=(const Angle&);
-			Angle operator*(const type&) const;
-			Angle operator/(const type& ) const;
-			Angle& operator *=(const type& );
-			Angle& operator /=(const type& );
-			bool operator==(const Angle& ) const;
-			bool operator!=(const Angle& ) const;
-			template<AngleInterval newstrategy>
-			Angle<type,newstrategy> ChangeInterval();
+
+			Angle& operator=(const Angle& angle);
+
+			Angle operator+(const Angle& angle) const;
+
+			Angle operator-(const Angle& angle) const;
+
+			Angle& operator +=(const Angle& other);
+
+			Angle& operator -=(const Angle& other);
+
+			Angle operator*(const_reference_type factor) const;
+
+			Angle operator/(const_reference_type factor) const;
+
+			Angle& operator *=(const_reference_type factor);
+
+			Angle& operator /=(const_reference_type factor);
+
+			bool operator==(const Angle& other) const;
+
+			bool operator!=(const Angle& other) const;
+			template<NAG::Concept::DerivedClass<AngleInterval<type>> NewInterval>
+			Angle<type, NewInterval> ChangeIntervalCopy();
+
+			AngleInterval<type> GetInterval()const;
+
 		private:
-			Angle(const type&);
+			Angle(const type& radiant);
 			type m_radiant;
-			IAngleInterval<type>* m_strategy;
+			AngleInterval<type> m_strategy;
 		};
 
-		template<typename type = float , AngleInterval Interval = UnsignedInterval<type>>
-		Angle<type, Interval> Degree(const type&);
+		template<NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval = UnsignedInterval<float>> requires Concept::AllOpAlgo<type>
+		Angle< type, Interval> Degree(const type&);
 
-		template<typename type =float, AngleInterval Interval = UnsignedInterval<type>>
-		Angle<type, Interval> Radiant(const type&);
+		template< NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval = UnsignedInterval<float>> requires Concept::AllOpAlgo<type>
+		Angle < type, Interval > Radiant(const type&);
 
-		template <typename type, AngleInterval Interval >
-		Angle<type, Interval> Degree(const type& degree)
+		template < NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval >requires Concept::AllOpAlgo<type>
+		Angle< type, Interval> Degree(const type& degree)
 		{
-			return Angle<type, Interval>(degree * (PI / 180.f));
+			auto rad = degree * (PI / 180.f);
+			return Angle<type, Interval>(rad);
 		}
 
-		template <typename type , AngleInterval Interval>
-		Angle<type, Interval> Radiant(const type& radiant)
+		template < NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
+		Angle< type, Interval> Radiant(const type& radiant)
 		{
 			return Angle<type, Interval>(radiant);
 		}
 
 
-		template <typename type>
-		IAngleInterval<type>::IAngleInterval(const float& min, const float& max ):m_min(min), m_max(max)
+		template <NAG::Concept::FloatingType type>
+		AngleInterval<type>::AngleInterval(const type& min, const type& max):m_min(min), m_max(max)
+		{}
+
+		template <NAG::Concept::FloatingType type>
+		AngleInterval<type>::AngleInterval(const AngleInterval& other):m_min(other.m_min),m_max(other.m_max)
+		{
+			
+		}
+
+		template <NAG::Concept::FloatingType type>
+		type AngleInterval<type>::GetMin() const
+		{
+			return m_min;
+		}
+
+		template <NAG::Concept::FloatingType type>
+		type AngleInterval<type>::GetMax() const
+		{
+			return m_max;
+		}
+
+		template <NAG::Concept::FloatingType type>
+		type AngleInterval<type>::Normalize(const type& radiant) const
+		{
+			type range = m_max - m_min;
+			type normalized = radiant - m_min;
+			normalized = fmod(normalized, range);
+			if (normalized < 0) {
+				normalized += range;
+			}
+			return normalized + m_min;
+		}
+
+		template <NAG::Concept::FloatingType type>
+		type AngleInterval<type>::Normalize(type& radiant)
+		{
+			type range = m_max - m_min;
+			type normalized = radiant - m_min;
+			normalized = fmod(normalized, range);
+			if (normalized < 0) {
+				normalized += range;
+			}
+			radiant = normalized + m_min;
+			return radiant;
+		}
+
+		template <NAG::Concept::FloatingType type>
+		template <NAG::Concept::FloatingType type2>
+		bool AngleInterval<type>::IsInInterval(const type2& min, const type2& max, const AngleInterval<type2>& interval)
+		{
+			return (interval.GetMin() == min && interval.GetMax() == max);
+		}
+
+		template <NAG::Concept::FloatingType type>
+		UnsignedInterval<type>::UnsignedInterval():AngleInterval<type>(0, 2 * PI)
+		{}
+
+		template <NAG::Concept::FloatingType type>
+		SignedInterval<type>::SignedInterval():AngleInterval<type>(-PI, PI)
+		{}
+
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
+		Angle<type, Interval>::Angle(): m_radiant(0), m_strategy(Interval{})
 		{
 		}
 
-		template <typename type>
-		UnsignedInterval<type>::UnsignedInterval():IAngleInterval<type>(0, 2 * PI)
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
+		Angle<type, Interval>::Angle(const Angle& other):m_radiant(other.m_radiant), m_strategy(Interval{})
 		{
 		}
 
-		template <typename type>
-		type UnsignedInterval<type>::Normalize(const type& radiant) const
-		{
-			type result = std::fmod(radiant, 2 * PI);
-			if (result < 0.0f) result += (2 * PI);
-			return result;
-		}
-
-		template <typename type>
-		SignedInterval<type>::SignedInterval() : IAngleInterval<type>(-PI,PI)
-		{
-		}
-
-		template <typename type>
-		type SignedInterval<type>::Normalize(const type& radiant) const
-		{
-			type result = std::fmod(radiant + PI, 2 * PI);
-			if (result < 0.0f) result += 2 * PI;
-			return result - PI;
-		}
-
-		template <typename type, AngleInterval Interval>
-		Angle<type, Interval>::Angle() : m_radiant(0),m_strategy(new Interval{})
-		{
-		}
-
-		template <typename type, AngleInterval Interval>
-		Angle<type, Interval>::~Angle()
-		{
-			delete m_strategy;
-			m_strategy = nullptr;
-		}
-
-		template <typename type, AngleInterval Interval>
-		Angle<type, Interval>::Angle(const Angle& other):m_radiant(other.m_radiant),m_strategy(new Interval{})
-		{
-		}
-
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		type Angle<type, Interval>::AsRadians()
 		{
-			
-			return m_strategy->Normalize(m_radiant);
+
+			return m_strategy.Normalize(m_radiant);
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		type Angle<type, Interval>::AsRadians() const
 		{
-			return m_strategy->Normalize(m_radiant);;
+			return m_strategy.Normalize(m_radiant);
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		type Angle<type, Interval>::AsDegrees()
 		{
-			
-			return (m_strategy->Normalize(m_radiant)* 180 / PI);
+
+			return (m_strategy.Normalize(m_radiant) * static_cast<type>(180) / static_cast<type>(PI));
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		type Angle<type, Interval>::AsDegrees() const
 		{
-			return (m_strategy->Normalize(m_radiant)* 180 / PI);
+
+			return (m_strategy.Normalize(m_radiant) * static_cast<type>(180) / static_cast<type>(PI));
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		Angle<type, Interval>& Angle<type, Interval>::operator=(const Angle& angle)
 		{
 			m_radiant = angle.m_radiant;
 			return *this;
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		Angle<type, Interval> Angle<type, Interval>::operator+(const Angle& angle) const
 		{
 			return Angle(m_radiant + angle.m_radiant);
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		Angle<type, Interval> Angle<type, Interval>::operator-(const Angle& angle) const
 		{
-			return Angle( m_radiant - angle.m_radiant);
+			return Angle(m_radiant - angle.m_radiant);
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		Angle<type, Interval>& Angle<type, Interval>::operator+=(const Angle& other)
 		{
 			m_radiant += other.m_radiant;
 			return *this;
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		Angle<type, Interval>& Angle<type, Interval>::operator-=(const Angle& other)
 		{
 			m_radiant -= other.m_radiant;
 			return *this;
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		Angle<type, Interval> Angle<type, Interval>::operator*(const type& factor) const
 		{
 			return Angle(m_radiant * factor);
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		Angle<type, Interval> Angle<type, Interval>::operator/(const type& factor) const
 		{
 			if (factor == 0)
@@ -212,14 +262,14 @@ namespace NAG
 			return Angle(m_radiant / factor);
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		Angle<type, Interval>& Angle<type, Interval>::operator*=(const type& factor)
 		{
 			m_radiant *= factor;
 			return *this;
 		}
 
-		template <typename type, AngleInterval Interval>
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
 		Angle<type, Interval>& Angle<type, Interval>::operator/=(const type& factor)
 		{
 			if (factor == 0)
@@ -228,63 +278,39 @@ namespace NAG
 			return *this;
 		}
 
-		template <typename type, AngleInterval Strategy>
-		bool Angle<type, Strategy>::operator==(const Angle& other) const
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
+		bool Angle<type, Interval>::operator==(const Angle& other) const
 		{
 			return m_radiant == other.m_radiant;
 		}
 
-		template <typename type, AngleInterval Strategy>
-		bool Angle<type, Strategy>::operator!=(const Angle& other) const
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
+		bool Angle<type, Interval>::operator!=(const Angle& other) const
 		{
 			return m_radiant != other.m_radiant;
 		}
 
-		template <typename type, AngleInterval Interval>
-		template <AngleInterval newstrategy>
-		Angle<type, newstrategy> Angle<type, Interval>::ChangeInterval()
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
+		template <NAG::Concept::DerivedClass<AngleInterval<type>> NewInterval>
+		Angle<type, NewInterval> Angle<type, Interval>::ChangeIntervalCopy()
 		{
-			return Radiant<type, newstrategy>(m_radiant);
+			return Radiant<type, NewInterval>(m_radiant);
 		}
 
-		template <typename type, AngleInterval Interval>
-		void Angle<type, Interval>::VerifyLimit()
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
+		AngleInterval<type> Angle<type, Interval>::GetInterval() const
 		{
-			auto min = m_strategy->Min();
-			auto max = m_strategy->Max();
-			float range = max - min;
-			 m_radiant = std::fmod(m_radiant - min, range);
-
-			if (m_radiant < 0)
-				m_radiant += range;
-
-			m_radiant += min;
+			return m_strategy;
 		}
 
-		template <typename type, AngleInterval Interval>
-		type Angle<type, Interval>::ConstVerifyLimit() const
-		{
-			auto min = m_strategy->Min();
-			auto max = m_strategy->Max();
-			float range = max - min;
-			type result = std::fmod(m_radiant - min, range);
-
-			if (result < 0)
-				result += range;
-
-			result += min;
-			return result;
-		}
-
-		template <typename type, AngleInterval Interval>
-		Angle<type, Interval>::Angle(const type& radiant) :m_radiant(radiant),m_strategy(new Interval{})
+		template <NAG::Concept::FloatingType type, NAG::Concept::DerivedClass<AngleInterval<type>> Interval>requires Concept::AllOpAlgo<type>
+		Angle<type, Interval>::Angle(const type& radiant):m_radiant(radiant), m_strategy(Interval{})
 		{
 		}
-
 	}
 }
-template<typename type>
-std::ostream& operator<<(std::ostream& os,  const NAG::Math::Angle < type>& angle)
+template< NAG::Concept::FloatingType type = float,NAG::Concept::DerivedClass<NAG::Math::AngleInterval<type>> Interval = NAG::Math::UnsignedInterval<type>>
+std::ostream& operator<<(std::ostream& os, const NAG::Math::Angle <type, Interval>& angle)
 {
 	os << "Angle: " << angle.AsRadians() << " Rad" << std::endl;
 	return os;

@@ -7,7 +7,7 @@ namespace NAG
 {
 	namespace Math
 	{
-		template<typename type, size_t size>
+		template<Concept::DefaultConstructorType type, size_t size>
 		class Array
 		{
 		public:
@@ -25,7 +25,7 @@ namespace NAG
 			Array();
 			Array(const Array&);
 			Array(const std::initializer_list<value_type>&);
-			template<typename... Args>
+			template<Concept::DefaultConstructorType... Args> requires Concept::IsConvertible<type, Args...>
 			Array(const Args&...);
 			virtual ~Array();
 			void Clear();
@@ -64,29 +64,29 @@ namespace NAG
 			void Swap(Array&);
 			
 		private:
-			template<typename T, typename... Rest>
-			void ConstructElements(const size_t& index, const T& first, const Rest&... rest);
-			template<typename T>
-			void ConstructElements(const size_t& index, const T& last);
+			template<typename type2, typename... Rest>
+			void ConstructElements(const size_t& index, const type2& first, const Rest&... rest);
+			template<typename type2>
+			void ConstructElements(const size_t& index, const type2& last);
 			void ConstructData();
 			type* m_data;
 		};
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		Array<type, size>::Array():m_data(nullptr)
 		{
 			ConstructData();
 			NAG::Algorithm::Fill(m_data, m_data + size, type{});
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		Array<type, size>::Array(const Array& other):m_data(nullptr)
 		{
 			ConstructData();
 			NAG::Algorithm::Copy(other.Begin(), other.End(), m_data);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		Array<type, size>::Array(const std::initializer_list<value_type>& list):m_data(nullptr)
 		{
 			ConstructData();
@@ -97,22 +97,22 @@ namespace NAG
 			NAG::Algorithm::Fill(m_data + list.size() , m_data + size, type{});
 		}
 
-		template <typename type, size_t size>
-		template <typename ... Args>
+		template <Concept::DefaultConstructorType type, size_t size>
+		template <Concept::DefaultConstructorType ... Args> requires Concept::IsConvertible<type, Args...>
 		Array<type, size>::Array(const Args&... arg):m_data(nullptr)
 		{
 			ConstructData();
 			ConstructElements(0, arg...);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		Array<type, size>::~Array()
 		{
 			delete[] m_data;
 			m_data = nullptr;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		void Array<type, size>::Clear()
 		{
 			delete[] m_data;
@@ -121,7 +121,7 @@ namespace NAG
 			NAG::Algorithm::Fill(m_data, m_data + size, type{});
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		Array<type,size>& Array<type, size>::operator=(const Array& other)
 		{
 			if (this == &other)
@@ -131,7 +131,7 @@ namespace NAG
 			return *this;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		bool Array<type, size>::operator==(const Array& other) const
 		{
 			if (size != other.Size())
@@ -144,7 +144,7 @@ namespace NAG
 			return true;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		bool Array<type, size>::operator!=(const Array& other) const
 		{
 			if (size != other.Size())
@@ -157,31 +157,31 @@ namespace NAG
 			return false;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		size_t Array<type, size>::Size() const
 		{
 			return  size;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		size_t Array<type, size>::MaxLimit() const
 		{
 			return size;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		bool Array<type, size>::IsEmpty() const
 		{
 			return size == 0;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::reference_type Array<type, size>::operator[](const size_t& index)
 		{
 			return m_data[index];
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::reference_type Array<type, size>::At(const size_t& index)
 		{
 			if (index >= size)
@@ -189,13 +189,13 @@ namespace NAG
 			return m_data[index];
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_reference_type Array<type, size>::operator[](const size_t& index) const
 		{
 			return m_data[index];
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_reference_type Array<type, size>::At(const size_t& index) const
 		{
 			if (index >= size)
@@ -203,7 +203,7 @@ namespace NAG
 			return m_data[index];
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::reference_type Array<type, size>::Front()
 		{
 			if (IsEmpty())
@@ -211,7 +211,7 @@ namespace NAG
 			return m_data[0];
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::reference_type Array<type, size>::Back()
 		{
 			if (IsEmpty())
@@ -219,7 +219,7 @@ namespace NAG
 			return m_data[size - 1];
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_reference_type Array<type, size>::Front() const
 		{
 			if (IsEmpty())
@@ -227,7 +227,7 @@ namespace NAG
 			return m_data[0];
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_reference_type Array<type, size>::Back() const
 		{
 			if (IsEmpty())
@@ -235,7 +235,7 @@ namespace NAG
 			return m_data[size - 1];
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::pointer_type Array<type, size>::Data()
 		{
 			if (IsEmpty())
@@ -243,7 +243,7 @@ namespace NAG
 			return m_data;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_pointer_type Array<type, size>::Data() const
 		{
 			if (IsEmpty())
@@ -251,7 +251,7 @@ namespace NAG
 			return m_data;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::iterator_type Array<type, size>::Begin()
 		{
 			if (IsEmpty())
@@ -259,7 +259,7 @@ namespace NAG
 			return Iterator<type>(m_data);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::iterator_type Array<type, size>::End()
 		{
 			if (IsEmpty())
@@ -267,7 +267,7 @@ namespace NAG
 			return Iterator<type>(m_data + size);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_iterator_type Array<type, size>::Begin() const
 		{
 			if (IsEmpty())
@@ -276,7 +276,7 @@ namespace NAG
 
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_iterator_type Array<type, size>::End() const
 		{
 			if (IsEmpty())
@@ -284,7 +284,7 @@ namespace NAG
 			return ConstIterator<type>(m_data + size);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_iterator_type Array<type, size>::CBegin() const
 		{
 			if (IsEmpty())
@@ -292,7 +292,7 @@ namespace NAG
 			return ConstIterator<type>(m_data);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_iterator_type Array<type, size>::CEnd() const
 		{
 			if (IsEmpty())
@@ -300,7 +300,7 @@ namespace NAG
 			return ConstIterator<type>(m_data + size);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::reverse_iterator_type Array<type, size>::RBegin()
 		{
 			if (IsEmpty())
@@ -308,7 +308,7 @@ namespace NAG
 			return ReverseIterator<type>(m_data + size - 1);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::reverse_iterator_type Array<type, size>::REnd()
 		{
 			if (IsEmpty())
@@ -316,7 +316,7 @@ namespace NAG
 			return ReverseIterator<type>(m_data  - 1);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_reverse_iterator_type Array<type, size>::RBegin() const
 		{
 			if (IsEmpty())
@@ -324,7 +324,7 @@ namespace NAG
 			return ConstReverseIterator<type>(m_data + size - 1);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_reverse_iterator_type Array<type, size>::REnd() const
 		{
 			if (IsEmpty())
@@ -332,7 +332,7 @@ namespace NAG
 			return ConstReverseIterator<type>(m_data - 1);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_reverse_iterator_type Array<type, size>::CRBegin() const
 		{
 			if (IsEmpty())
@@ -340,7 +340,7 @@ namespace NAG
 			return ConstReverseIterator<type>(m_data + size - 1);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		typename Array<type, size>::const_reverse_iterator_type Array<type, size>::CREnd() const
 		{
 			if (IsEmpty())
@@ -348,7 +348,7 @@ namespace NAG
 			return ConstReverseIterator<type>(m_data - 1);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		void Array<type, size>::Assign(const size_t& sizeofvalue, const value_type& data)
 		{
 			Clear();
@@ -358,7 +358,7 @@ namespace NAG
 			NAG::Algorithm::Fill(m_data + sizeofvalue, m_data + size, type{});
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		void Array<type, size>::Assign(const std::initializer_list<value_type>& list)
 		{
 			Clear();
@@ -368,7 +368,7 @@ namespace NAG
 			NAG::Algorithm::Fill(m_data + list.size(), m_data + size, type{});
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		template <NAG::Category::Iterator_Category IT>
 		void Array<type, size>::Assign(const IT& begin, const IT& end)
 		{
@@ -383,7 +383,7 @@ namespace NAG
 			NAG::Algorithm::Fill(m_data + sizediff, m_data + size, type{});
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		void Array<type, size>::Swap(Array& other)
 		{
 			auto tmpdata = m_data;
@@ -392,27 +392,27 @@ namespace NAG
 		}
 
 
-		template <typename type, size_t size>
-		template <typename T, typename ... Rest>
-		void Array<type, size>::ConstructElements(const size_t& index, const T& first, const Rest&... rest)
+		template <Concept::DefaultConstructorType type, size_t size>
+		template <typename type2, typename ... Rest>
+		void Array<type, size>::ConstructElements(const size_t& index, const type2& first, const Rest&... rest)
 		{
 			if (index >= size)
 				throw std::out_of_range("out of range");
-			m_data[index] = first;
+			m_data[index] = static_cast<type>(first);
 			ConstructElements(index + 1 , rest...);
 			
 		}
 
-		template <typename type, size_t size>
-		template <typename T>
-		void Array<type, size>::ConstructElements(const size_t& index, const T& last)
+		template <Concept::DefaultConstructorType type, size_t size>
+		template <typename type2>
+		void Array<type, size>::ConstructElements(const size_t& index, const type2& last)
 		{
 			if (index >= size)
 				throw std::out_of_range("out of range");
-			m_data[index] = last;
+			m_data[index] = static_cast<type>(last);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::DefaultConstructorType type, size_t size>
 		void Array<type, size>::ConstructData()
 		{
 			if (m_data)
@@ -421,7 +421,7 @@ namespace NAG
 		}
 	}
 }
-template<typename type,size_t size>
+template<NAG::Concept::DefaultConstructorType type,size_t size>
 std::ostream& operator<<(std::ostream& os, const NAG::Math::Array < type,size >& array )
 {
 	os << "Arr: ";

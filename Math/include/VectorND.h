@@ -5,7 +5,7 @@ namespace NAG
 {
 	namespace Math
 	{
-		template<typename type, size_t size>
+		template<Concept::AllOpAlgo type, size_t size> requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		class VectorND
 		{
 		public:
@@ -18,9 +18,10 @@ namespace NAG
 			VectorND();
 			VectorND(const VectorND&);
 			VectorND(const std::initializer_list <type> &);
-			template<typename... Args>
+			template<Concept::AllOpAlgo... Args> requires Concept::IsConvertible<type, Args...> && Concept::DefaultConstructorType<Args...>
 			VectorND(const Args&...);
 			~VectorND()=default;
+			void Clear();
 			VectorND& operator=(const VectorND&);
 			bool operator==(const VectorND&) const;
 			bool operator!=(const VectorND&) const;
@@ -46,30 +47,36 @@ namespace NAG
 			Array<type, size> m_data;
 		};
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size>::VectorND() : m_data()
 		{
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size>::VectorND(const VectorND& other) :m_data(other.m_data)
 		{
 
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size>::VectorND(const std::initializer_list<type>& list) : m_data(list)
 		{
 		}
 
-		template <typename type, size_t size>
-		template <typename ... Args>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
+		template <Concept::AllOpAlgo ... Args> requires Concept::IsConvertible<type, Args...> && Concept::DefaultConstructorType<Args...>
 		VectorND<type, size>::VectorND(const Args&... arg): m_data(arg...)
 		{
 
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size> requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
+		void VectorND<type, size>::Clear()
+		{
+			m_data.Clear();
+		}
+
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size>& VectorND<type, size>::operator=(const VectorND& other)
 		{
 			if (this == &other)
@@ -78,19 +85,19 @@ namespace NAG
 			return *this;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		bool VectorND<type, size>::operator==(const VectorND& other) const
 		{
 			return m_data == other.m_data;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		bool VectorND<type, size>::operator!=(const VectorND& other) const
 		{
 			return m_data != other.m_data;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size> VectorND<type, size>::operator+(const VectorND<type, size>& other) const
 		{
 			VectorND result;
@@ -101,7 +108,7 @@ namespace NAG
 			return  result;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size> VectorND<type, size>::operator-(const VectorND<type, size>& other) const
 		{
 			VectorND result;
@@ -112,7 +119,7 @@ namespace NAG
 			return  result;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size>& VectorND<type, size>::operator+=(const VectorND<type, size>& other)
 		{
 			for (size_t i = 0; i < size; ++i)
@@ -122,7 +129,7 @@ namespace NAG
 			return  *this;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size>& VectorND<type, size>::operator-=(const VectorND<type, size>& other)
 		{
 			for (size_t i = 0; i < size; ++i)
@@ -132,7 +139,7 @@ namespace NAG
 			return  *this;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size> VectorND<type, size>::operator*(const type& factor) const
 		{
 			VectorND result ;
@@ -143,7 +150,7 @@ namespace NAG
 			return  result;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size> VectorND<type, size>::operator/(const type& factor) const
 		{
 			if (factor == 0)
@@ -157,7 +164,7 @@ namespace NAG
 			return  result;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size>& VectorND<type, size>::operator*=(const type& factor)
 		{
 		
@@ -168,7 +175,7 @@ namespace NAG
 			return  *this;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size>& VectorND<type, size>::operator/=(const type& factor)
 		{
 			if (factor == 0)
@@ -180,7 +187,7 @@ namespace NAG
 			return  *this;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		type VectorND<type, size>::Norm() const
 		{
 			type result =type{};
@@ -191,7 +198,7 @@ namespace NAG
 			return std::sqrt(result);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		VectorND<type, size> VectorND<type, size>::Normalize() const
 		{
 			type length = Norm();
@@ -200,7 +207,7 @@ namespace NAG
 			return *this / length;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		bool VectorND<type, size>::IsZero() const
 		{
 			for (size_t i  = 0 ; i < size  ; ++ i)
@@ -211,7 +218,7 @@ namespace NAG
 			return true;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		type VectorND<type, size>::Dot(const VectorND<type, size>& other) const
 		{
 			type result = type{};
@@ -222,38 +229,38 @@ namespace NAG
 			return result;
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		size_t VectorND<type, size>::Size() const
 		{
 			return m_data.Size();
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		typename VectorND<type, size>::reference_type VectorND<type, size>::operator[](const size_t& index)
 		{
 			return m_data[index];
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		typename VectorND<type, size>::reference_type VectorND<type, size>::At(const size_t& index)
 		{
 			return m_data.At(index);
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		typename VectorND<type, size>::const_reference_type VectorND<type, size>::operator[](const size_t& index) const
 		{
 			return m_data[index];
 		}
 
-		template <typename type, size_t size>
+		template <Concept::AllOpAlgo type, size_t size>requires Concept::MinValue<1, size>&& Concept::DefaultConstructorType<type>
 		typename VectorND<type, size>::const_reference_type VectorND<type, size>::At(const size_t& index) const
 		{
 			return m_data.At(index);
 		}
 	}
 }
-template<typename type, size_t size>
+template<NAG::Concept::AllOpAlgo type, size_t size>
 std::ostream& operator<<(std::ostream& os, const NAG::Math::VectorND < type, size >& vectorND)
 {
 	os << "VecND: ";
