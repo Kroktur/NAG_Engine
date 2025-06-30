@@ -1,18 +1,16 @@
 #pragma once
-#include "Utility.h"
-namespace NAG
+namespace KT
 {
 	namespace Math
 	{
-		template<typename  type> 
+		template<typename type>
 		class Iterator
 		{
 		public:
 			using value_type = type;
 			using pointer_type = type*;
 			using reference_type = type&;
-			using difference_type = std::ptrdiff_t;
-			using Iterator_type = int;
+			using difference_type =std::ptrdiff_t;
 			Iterator(pointer_type);
 			Iterator(const Iterator&);
 			Iterator();
@@ -31,7 +29,9 @@ namespace NAG
 			bool operator>=(const Iterator&) const;
 			bool operator<=(const Iterator&) const;
 			Iterator& operator=(const Iterator&);
+			Iterator operator+(const difference_type&);
 			Iterator operator+(const difference_type&) const;
+			Iterator operator-(const difference_type&) ;
 			Iterator operator-(const difference_type&) const;
 			Iterator& operator+=(const difference_type&);
 			Iterator& operator-=(const difference_type&);
@@ -156,9 +156,21 @@ namespace NAG
 		}
 
 		template <typename type>
+		Iterator<type> Iterator<type>::operator+(const difference_type& index)
+		{
+			return Iterator(m_data + index);
+		}
+
+		template <typename type>
 		Iterator<type> Iterator<type>::operator+(const difference_type& index) const
 		{
 			return Iterator(m_data + index);
+		}
+
+		template <typename type>
+		Iterator<type> Iterator<type>::operator-(const difference_type& index)
+		{
+			return Iterator(m_data - index);
 		}
 
 		template <typename type>
@@ -200,7 +212,6 @@ public:
 	using pointer_type = const type*;
 	using reference_type = const type&;
 	using difference_type = std::ptrdiff_t;
-	using Iterator_type = int;
 	ConstIterator(pointer_type);
 	ConstIterator(const ConstIterator&);
 	ConstIterator();
@@ -219,7 +230,9 @@ public:
 	bool operator>=(const ConstIterator&) const;
 	bool operator<=(const ConstIterator&) const;
 	ConstIterator& operator=(const ConstIterator&);
+	ConstIterator operator+(const difference_type&);
 	ConstIterator operator+(const difference_type&) const;
+	ConstIterator operator-(const difference_type&);
 	ConstIterator operator-(const difference_type&) const;
 	ConstIterator& operator+=(const difference_type&);
 	ConstIterator& operator-=(const difference_type&);
@@ -344,6 +357,11 @@ ConstIterator<type>& ConstIterator<type>::operator=(const ConstIterator& it)
 	return *this;
 }
 
+template <typename type>
+ConstIterator<type> ConstIterator<type>::operator+(const difference_type& index)
+{
+	return ConstIterator(m_data + index);
+}
 
 template <typename type>
 ConstIterator<type> ConstIterator<type>::operator+(const difference_type& index) const
@@ -351,11 +369,16 @@ ConstIterator<type> ConstIterator<type>::operator+(const difference_type& index)
 	return ConstIterator(m_data + index);
 }
 
+template <typename type>
+ConstIterator<type> ConstIterator<type>::operator-(const difference_type& index)
+{
+	return ConstIterator(m_data - index);
+}
 
 template <typename type>
 ConstIterator<type> ConstIterator<type>::operator-(const difference_type& index) const
 {
-	return ConstIterator(m_data - index);
+	return Iterator(m_data - index);
 }
 
 template <typename type>
