@@ -22,6 +22,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     Game
+    Math
 )
 find_package(SFML COMPONENTS 
     System
